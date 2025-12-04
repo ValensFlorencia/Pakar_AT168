@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Pakar Diagnosa Penyakit Ayam - Dashboard</title>
+
     <style>
         * {
             margin: 0;
@@ -22,7 +23,7 @@
             min-height: 100vh;
         }
 
-        /* Sidebar */
+        /* SIDEBAR */
         .sidebar {
             width: 260px;
             background: linear-gradient(180deg, #ffe66d 0%, #ffd93d 100%);
@@ -40,7 +41,6 @@
         .logo h1 {
             font-size: 24px;
             font-weight: 700;
-            letter-spacing: 0.5px;
         }
 
         .menu {
@@ -53,10 +53,10 @@
             align-items: center;
             gap: 12px;
             cursor: pointer;
-            transition: all 0.3s ease;
             border-left: 4px solid transparent;
             text-decoration: none;
             color: inherit;
+            transition: 0.3s ease;
         }
 
         .menu-item:hover {
@@ -69,38 +69,21 @@
             border-left-color: #f9a825;
         }
 
-        .menu-icon {
-            font-size: 20px;
-        }
-
-        /* Main Content */
+        /* MAIN AREA */
         .main-content {
             flex: 1;
             background: linear-gradient(135deg, #fff9e6 0%, #ffe4b3 100%);
         }
 
+        /* HEADER — SUDAH DISAMAKAN WARNA */
         .header {
-            background: white;
+            background: linear-gradient(180deg, #ffe66d 0%, #ffd93d 100%);
             padding: 25px 40px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
             align-items: center;
-            border-bottom: 3px solid #ffe66d;
-        }
-
-        .header-title {
-            color: #5a4a2a;
-            font-size: 18px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .header-title::before {
-            content: '🏠';
-            font-size: 22px;
+            border-bottom: 3px solid #e6c600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
         .logout-btn {
@@ -111,217 +94,139 @@
             border-radius: 25px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s ease;
+            transition: 0.3s ease;
             box-shadow: 0 4px 15px rgba(246,185,59,0.3);
         }
 
         .logout-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(246,185,59,0.4);
         }
 
+        /* CONTENT */
         .content {
             padding: 40px;
         }
 
         .page-title {
-            color: #5a4a2a;
             font-size: 36px;
-            margin-bottom: 10px;
             font-weight: 700;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+            color: #5a4a2a;
+            margin-bottom: 10px;
         }
 
         .page-subtitle {
             color: #8b7355;
-            margin-bottom: 35px;
             font-size: 16px;
             font-weight: 500;
+            margin-bottom: 35px;
         }
 
-        /* Stats Cards */
+        /* STAT CARDS */
         .stats-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px,1fr));
             gap: 25px;
-            margin-top: 20px;
         }
 
         .stat-card {
             background: white;
-            border-radius: 20px;
             padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-        .stat-card.green::before {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-        }
-
-        .stat-card.orange::before {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .stat-card.yellow::before {
-            background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
         }
 
         .stat-info h2 {
             font-size: 48px;
             font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .stat-card.green .stat-info h2 {
-            color: #11998e;
-        }
-
-        .stat-card.orange .stat-info h2 {
-            color: #f5576c;
-        }
-
-        .stat-card.yellow .stat-info h2 {
-            color: #19547b;
         }
 
         .stat-info p {
             color: #7f8c8d;
-            font-size: 16px;
-            font-weight: 500;
-        }
-
-        .stat-icon {
-            font-size: 70px;
-            opacity: 0.2;
-        }
-
-        .stat-card.green .stat-icon {
-            color: #11998e;
-        }
-
-        .stat-card.orange .stat-icon {
-            color: #f5576c;
-        }
-
-        .stat-card.yellow .stat-icon {
-            color: #19547b;
         }
 
         .footer {
             text-align: center;
-            padding: 30px;
+            padding: 25px;
             color: #8b7355;
-            font-size: 14px;
-            margin-top: 50px;
-            font-weight: 500;
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 80px;
-            }
-
-            .logo h1, .menu-item span:not(.menu-icon) {
-                display: none;
-            }
-
-            .stats-container {
-                grid-template-columns: 1fr;
-            }
+            margin-top: 40px;
         }
     </style>
+
 </head>
 <body>
-    <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="logo">
-                <h1>🐔 Sistem Pakar</h1>
-            </div>
-            <div class="menu">
-                <a href="{{ route('dashboard') }}"
-                   class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                    <span class="menu-icon">📊</span>
-                    <span>Dashboard</span>
-                </a>
 
-                <a href="{{ route('penyakit.index') }}"
-                   class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
-                    <span class="menu-icon">☠️</span>
-                    <span>Data Penyakit</span>
-                </a>
-            </div>
+<div class="container">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <h1>🐔 Sistem Pakar</h1>
         </div>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <div class="header">
-                <div class="header-title">Beranda</div>
+        <div class="menu">
+            <a href="{{ route('dashboard') }}"
+               class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                <span>📊</span> <span>Dashboard</span>
+            </a>
 
-                <form action="{{ route('logout') }}" method="POST">
-                    @csrf
-                    <button type="submit" class="logout-btn">🚪 Logout</button>
-                </form>
-            </div>
-
-            <div class="content">
-                <h1 class="page-title">Beranda</h1>
-                <p class="page-subtitle">Ringkasan Sistem Pakar Diagnosa Penyakit Ayam</p>
-
-                <div class="stats-container">
-                    <!-- Total Gejala -->
-                    <div class="stat-card green">
-                        <div class="stat-info">
-                            <h2>{{ $totalGejala ?? 0 }}</h2>
-                            <p>Total Gejala</p>
-                        </div>
-                        <div class="stat-icon">⚙️</div>
-                    </div>
-
-                    <!-- Total Penyakit -->
-                    <div class="stat-card orange">
-                        <div class="stat-info">
-                            <h2>{{ $totalPenyakit ?? 0 }}</h2>
-                            <p>Total Penyakit</p>
-                        </div>
-                        <div class="stat-icon">☠️</div>
-                    </div>
-
-                    <!-- Total Rule -->
-                    <div class="stat-card yellow">
-                        <div class="stat-info">
-                            <h2>{{ $totalRule ?? 0 }}</h2>
-                            <p>Total Rule</p>
-                        </div>
-                        <div class="stat-icon">📋</div>
-                    </div>
-                </div>
-
-                <div class="footer">
-                    © {{ date('Y') }} Sistem Pakar Diagnosa Penyakit Ayam •
-                </div>
-            </div>
+            <a href="{{ route('penyakit.index') }}"
+               class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
+                <span>☠️</span> <span>Data Penyakit</span>
+            </a>
         </div>
     </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- HEADER -->
+        <div class="header">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button class="logout-btn">🚪 Logout</button>
+            </form>
+        </div>
+
+        <div class="content">
+            <h1 class="page-title">Beranda</h1>
+            <p class="page-subtitle">Ringkasan Sistem Pakar Diagnosa Penyakit Ayam</p>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h2>{{ $totalGejala ?? 0 }}</h2>
+                        <p>Total Gejala</p>
+                    </div>
+                    <div class="stat-icon">⚙️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h2>{{ $totalPenyakit ?? 0 }}</h2>
+                        <p>Total Penyakit</p>
+                    </div>
+                    <div class="stat-icon">☠️</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h2>{{ $totalRule ?? 0 }}</h2>
+                        <p>Total Rule</p>
+                    </div>
+                    <div class="stat-icon">📋</div>
+                </div>
+            </div>
+
+            <div class="footer">
+                © {{ date('Y') }} Sistem Pakar Diagnosa Penyakit Ayam
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
 </body>
 </html>
