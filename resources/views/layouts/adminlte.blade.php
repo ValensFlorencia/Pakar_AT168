@@ -22,7 +22,7 @@
             border-bottom: 1px solid rgba(249, 168, 37, 0.25);
         }
 
-        /* brand di sidebar */
+        /* sidebar gradient kuning pastel */
         .main-sidebar {
             background: linear-gradient(180deg, #facc15, #fbbf24, #fb923c);
         }
@@ -66,7 +66,7 @@
             border: none;
         }
 
-        /* small-box pastel khusus sistem pakar ayam */
+        /* small-box pastel */
         .small-box.bg-ayam {
             background: linear-gradient(135deg, #22c55e, #a3e635);
             border-radius: 0.9rem;
@@ -92,7 +92,7 @@
 <body class="hold-transition sidebar-mini">
 <div class="wrapper">
 
-    {{-- Navbar --}}
+    {{-- NAVBAR --}}
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
         <ul class="navbar-nav">
             <li class="nav-item">
@@ -117,7 +117,7 @@
         </ul>
     </nav>
 
-    {{-- Sidebar --}}
+    {{-- SIDEBAR --}}
     <aside class="main-sidebar elevation-4">
         <a href="{{ route('dashboard') }}" class="brand-link text-center">
             <span class="brand-text text-white">Peduli Ayam</span>
@@ -126,19 +126,29 @@
         <div class="sidebar">
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview">
+
+                    {{-- DASHBOARD --}}
                     <li class="nav-item">
-                        <a href="{{ route('dashboard') }}" class="nav-link active">
+                        <a href="{{ route('dashboard') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-tachometer-alt"></i>
                             <p>Dashboard</p>
                         </a>
                     </li>
-                    {{-- nanti tambah menu Gejala, Penyakit, Rule, Diagnosa di sini --}}
+
+                    {{-- DATA PENYAKIT --}}
+                    <li class="nav-item">
+                        <a href="{{ route('penyakit.index') }}" class="nav-link {{ request()->is('penyakit*') ? 'active' : '' }}">
+                            <i class="nav-icon fas fa-skull-crossbones"></i>
+                            <p>Data Penyakit</p>
+                        </a>
+                    </li>
+
                 </ul>
             </nav>
         </div>
     </aside>
 
-    {{-- Content --}}
+    {{-- CONTENT --}}
     <div class="content-wrapper">
         <section class="content pt-3 pb-4">
             <div class="container-fluid">
@@ -150,6 +160,7 @@
     <footer class="main-footer text-sm text-center">
         &copy; {{ date('Y') }} Sistem Pakar Diagnosa Penyakit Ayam • Peduli Ayam
     </footer>
+
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>

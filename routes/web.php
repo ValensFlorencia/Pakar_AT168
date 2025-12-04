@@ -1,24 +1,36 @@
 <?php
 
-use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\PenyakitController;
+
+/*
+|--------------------------------------------------------------------------
+| Web Routes (Clean Version)
+|--------------------------------------------------------------------------
+| Semua route publik diarahkan ke /login. Route lain di-protect middleware "auth".
+*/
 
 Route::redirect('/', '/login');
 
+// =====================
+// ROUTE PROTEKSI LOGIN
+// =====================
 Route::middleware(['auth'])->group(function () {
+
+    // DASHBOARD
     Route::get('/dashboard', function () {
-        return view('dashboard'); // ini file resources/views/dashboard.blade.php
+        return view('dashboard');
     })->name('dashboard');
-});
-    // LOGOUT
-    Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
 
+    // DATA PENYAKIT (CRUD)
+    Route::resource('penyakit', PenyakitController::class);
 
-Route::middleware('auth')->group(function () {
+    // PROFILE (opsional)
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-require __DIR__.'/auth.php';
+// ROUTE LOGIN/LOGOUT ADA DI auth.php
+require __DIR__ . '/auth.php';

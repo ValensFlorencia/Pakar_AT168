@@ -55,6 +55,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             border-left: 4px solid transparent;
+            text-decoration: none;
+            color: inherit;
         }
 
         .menu-item:hover {
@@ -79,16 +81,26 @@
 
         .header {
             background: white;
-            padding: 20px 40px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 25px 40px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.08);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 3px solid #ffe66d;
         }
 
         .header-title {
-            color: #2c3e50;
-            font-size: 16px;
+            color: #5a4a2a;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-title::before {
+            content: '🏠';
+            font-size: 22px;
         }
 
         .logout-btn {
@@ -113,16 +125,18 @@
         }
 
         .page-title {
-            color: #2c3e50;
-            font-size: 32px;
+            color: #5a4a2a;
+            font-size: 36px;
             margin-bottom: 10px;
             font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
         }
 
         .page-subtitle {
-            color: #7f8c8d;
-            margin-bottom: 30px;
-            font-size: 15px;
+            color: #8b7355;
+            margin-bottom: 35px;
+            font-size: 16px;
+            font-weight: 500;
         }
 
         /* Stats Cards */
@@ -216,9 +230,10 @@
         .footer {
             text-align: center;
             padding: 30px;
-            color: #7f8c8d;
+            color: #8b7355;
             font-size: 14px;
             margin-top: 50px;
+            font-weight: 500;
         }
 
         @media (max-width: 768px) {
@@ -226,7 +241,7 @@
                 width: 80px;
             }
 
-            .logo h1, .menu-item span {
+            .logo h1, .menu-item span:not(.menu-icon) {
                 display: none;
             }
 
@@ -244,10 +259,17 @@
                 <h1>🐔 Sistem Pakar</h1>
             </div>
             <div class="menu">
-                <div class="menu-item active">
+                <a href="{{ route('dashboard') }}"
+                   class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <span class="menu-icon">📊</span>
                     <span>Dashboard</span>
-                </div>
+                </a>
+
+                <a href="{{ route('penyakit.index') }}"
+                   class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
+                    <span class="menu-icon">☠️</span>
+                    <span>Data Penyakit</span>
+                </a>
             </div>
         </div>
 
@@ -255,7 +277,11 @@
         <div class="main-content">
             <div class="header">
                 <div class="header-title">Beranda</div>
-                <button class="logout-btn">🚪 Logout</button>
+
+                <form action="{{ route('logout') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="logout-btn">🚪 Logout</button>
+                </form>
             </div>
 
             <div class="content">
@@ -266,7 +292,7 @@
                     <!-- Total Gejala -->
                     <div class="stat-card green">
                         <div class="stat-info">
-                            <h2>0</h2>
+                            <h2>{{ $totalGejala ?? 0 }}</h2>
                             <p>Total Gejala</p>
                         </div>
                         <div class="stat-icon">⚙️</div>
@@ -275,7 +301,7 @@
                     <!-- Total Penyakit -->
                     <div class="stat-card orange">
                         <div class="stat-info">
-                            <h2>0</h2>
+                            <h2>{{ $totalPenyakit ?? 0 }}</h2>
                             <p>Total Penyakit</p>
                         </div>
                         <div class="stat-icon">☠️</div>
@@ -284,7 +310,7 @@
                     <!-- Total Rule -->
                     <div class="stat-card yellow">
                         <div class="stat-info">
-                            <h2>0</h2>
+                            <h2>{{ $totalRule ?? 0 }}</h2>
                             <p>Total Rule</p>
                         </div>
                         <div class="stat-icon">📋</div>
@@ -292,7 +318,7 @@
                 </div>
 
                 <div class="footer">
-                    © 2025 Sistem Pakar Diagnosa Penyakit Ayam •
+                    © {{ date('Y') }} Sistem Pakar Diagnosa Penyakit Ayam •
                 </div>
             </div>
         </div>
