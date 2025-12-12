@@ -22,16 +22,15 @@ class BasisPengetahuanCF extends Model
     /**
      * Relasi ke tabel penyakit
      */
+
     public function penyakit()
     {
-        return $this->belongsTo(Penyakit::class);
+        return $this->belongsTo(\App\Models\Penyakit::class, 'penyakit_id');
     }
 
-    /**
-     * Relasi ke tabel gejala
-     */
     public function gejala()
     {
-        return $this->belongsTo(Gejala::class);
+        return $this->belongsTo(\App\Models\Gejala::class, 'gejala_id');
     }
+
 }

@@ -34,26 +34,26 @@
         </div>
     @endif
 
-    <form action="{{ route('basis_cf.update', $basisCF->id) }}" method="POST">
+    <form action="{{ route('basis_pengetahuan_cf.update', $basisCF->id) }}" method="POST">
         @csrf
         @method('PUT')
 
         {{-- NAMA PENYAKIT --}}
         <div class="form-group" style="margin-bottom:25px;">
             <label style="font-weight:600;">Nama Penyakit</label>
-            <select name="penyakit_id" required
+
+            <select disabled
                     style="width:100%; padding:15px;
-                           border:2px solid #ffe4b3;
-                           border-radius:12px;
-                           background:#fffdf7;">
-                <option value="">-- Pilih Penyakit --</option>
-                @foreach($penyakits as $p)
-                    <option value="{{ $p->id }}"
-                            {{ $basisCF->penyakit_id == $p->id ? 'selected' : '' }}>
-                        {{ $p->kode_penyakit }} - {{ $p->nama_penyakit }}
-                    </option>
-                @endforeach
+                        border:2px solid #ffe4b3;
+                        border-radius:12px;
+                        background:#fffdf7;">
+                <option>
+                    {{ $basisCF->penyakit->kode_penyakit }} - {{ $basisCF->penyakit->nama_penyakit }}
+                </option>
             </select>
+
+            <input type="hidden" name="penyakit_id" value="{{ $basisCF->penyakit_id }}">
+
         </div>
 
         {{-- CARD GEJALA + CF (SAMA SEPERTI CREATE, TAPI 1 BARIS SAJA) --}}
@@ -78,19 +78,19 @@
                  style="display:flex; gap:12px; margin-bottom:10px; align-items:center;">
 
                 {{-- DROPDOWN GEJALA --}}
-                <select name="gejala_id" required
+                <select disabled
                         style="flex:2; padding:12px 14px;
-                               border-radius:12px;
-                               border:1px solid #e5e7eb;
-                               background:#ffffff;">
-                    <option value="">-- Pilih Gejala --</option>
-                    @foreach($gejalas as $g)
-                        <option value="{{ $g->id }}"
-                            {{ $basisCF->gejala_id == $g->id ? 'selected' : '' }}>
-                            {{ $g->kode_gejala }} - {{ $g->nama_gejala }}
-                        </option>
-                    @endforeach
+                            border-radius:12px;
+                            border:1px solid #e5e7eb;
+                            background:#ffffff;">
+                    <option>
+                        {{ $basisCF->gejala->kode_gejala }} - {{ $basisCF->gejala->nama_gejala }}
+                    </option>
                 </select>
+
+                <input type="hidden" name="gejala_id" value="{{ $basisCF->gejala_id }}">
+
+
 
                 {{-- DROPDOWN CF --}}
                 @php
@@ -102,21 +102,26 @@
                         '0.8' => '0.8 - Yakin',
                         '1'   => '1 - Sangat Yakin',
                     ];
+
+                    // samakan format dari DB jadi 1 angka di belakang koma
+                    $currentCF = number_format((float)$basisCF->cf_value, 1); // contoh: 0.20 -> "0.2", 1.00 -> "1.0"
                 @endphp
 
                 <select name="cf_value" required
                         style="flex:1; padding:12px 14px;
-                               border-radius:12px;
-                               border:1px solid #e5e7eb;
-                               background:#ffffff;">
+                            border-radius:12px;
+                            border:1px solid #e5e7eb;
+                            background:#ffffff;">
                     <option value="">-- Bobot CF --</option>
+
                     @foreach($cfOptions as $val => $label)
                         <option value="{{ $val }}"
-                            {{ (string)$basisCF->cf_value === $val ? 'selected' : '' }}>
+                            {{ $currentCF === number_format((float)$val, 1) ? 'selected' : '' }}>
                             {{ $label }}
                         </option>
                     @endforeach
                 </select>
+
 
             </div>
         </div>
@@ -137,7 +142,7 @@
                 Simpan Perubahan
             </button>
 
-            <a href="{{ route('basis_cf.index') }}"
+            <a href="{{ route('basis_pengetahuan_cf.index') }}"
                style="
                     padding:14px 35px;
                     background:#e0e0e0;

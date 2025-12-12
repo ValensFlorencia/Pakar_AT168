@@ -19,9 +19,7 @@
         box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
     }
 
-    .form-group {
-        margin-bottom: 28px;
-    }
+    .form-group { margin-bottom: 28px; }
 
     .form-label {
         display: block;
@@ -102,9 +100,7 @@
         transition: all 0.2s ease;
     }
 
-    .gejala-select:focus {
-        border-color: #3498db;
-    }
+    .gejala-select:focus { border-color: #3498db; }
 
     .cf-select {
         flex: 1;
@@ -116,9 +112,7 @@
         transition: all 0.2s ease;
     }
 
-    .cf-select:focus {
-        border-color: #3498db;
-    }
+    .cf-select:focus { border-color: #3498db; }
 
     .btn-delete {
         background: #fee;
@@ -204,26 +198,22 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
-    .required-mark {
-        color: #e74c3c;
-        margin-left: 4px;
-    }
+    .required-mark { color: #e74c3c; margin-left: 4px; }
 </style>
 
 <h1 class="page-title">Tambah Basis Pengetahuan CF</h1>
 
 <div class="form-card">
     <form action="{{ route('basis_pengetahuan_cf.store') }}" method="POST">
-    </form>
         @csrf
 
         {{-- Penyakit --}}
         <div class="form-group">
             <label class="form-label">
-                Nama Penyakit
-                <span class="required-mark">*</span>
+                Nama Penyakit <span class="required-mark">*</span>
             </label>
-            <select name="penyakit_id" class="form-select" required>
+            {{-- ✅ kasih ID biar JS bisa baca penyakit yang dipilih --}}
+            <select name="penyakit_id" id="penyakit-select" class="form-select" required>
                 <option value="">-- Pilih Penyakit --</option>
                 @foreach($penyakits as $p)
                     <option value="{{ $p->id }}">{{ $p->kode_penyakit }} - {{ $p->nama_penyakit }}</option>
@@ -233,19 +223,14 @@
 
         {{-- Gejala Section --}}
         <div class="gejala-section">
-            <div class="section-label">
-                Gejala & Bobot Certainty Factor
-            </div>
+            <div class="section-label">Gejala & Bobot Certainty Factor</div>
 
             <div id="gejala-wrapper">
-                {{-- Baris pertama --}}
                 <div class="gejala-row">
                     <select name="gejalas[0][gejala_id]" class="gejala-select" required>
                         <option value="">-- Pilih Gejala --</option>
                         @foreach($gejalas as $g)
-                            <option value="{{ $g->id }}">
-                                {{ $g->kode_gejala }} - {{ $g->nama_gejala }}
-                            </option>
+                            <option value="{{ $g->id }}">{{ $g->kode_gejala }} - {{ $g->nama_gejala }}</option>
                         @endforeach
                     </select>
 
@@ -263,115 +248,121 @@
                 </div>
             </div>
 
-            {{-- Tombol tambah baris --}}
             <button type="button" class="btn-add" onclick="tambahGejala()">
-                <span style="font-size: 18px;">+</span>
-                Tambah Gejala
+                <span style="font-size: 18px;">+</span> Tambah Gejala
             </button>
         </div>
 
         {{-- Action Buttons --}}
         <div class="btn-actions">
-            <button type="submit" class="btn-submit">
-                Simpan
-            </button>
-            <a href="{{ route('basis_pengetahuan_cf.index') }}" class="btn-back">
-                Kembali
-            </a>
+            <button type="submit" class="btn-submit">Simpan</button>
+            <a href="{{ route('basis_pengetahuan_cf.index') }}" class="btn-back">Kembali</a>
         </div>
+
     </form>
 </div>
+
 <script>
-// Fungsi global supaya bisa dipanggil dari mana saja
-function updateDisabledOptions() {
-    // Ambil semua select gejala
-    const selects = document.querySelectorAll('.gejala-select');
+    // ✅ dari controller: $existingMap
+    const existingMap = @json($existingMap ?? []);
 
-    // Ambil semua value yang sudah dipilih
-    const selectedValues = Array.from(selects)
-        .map(s => s.value)
-        .filter(v => v !== "");
+    function refreshGejalaOptions() {
+        const penyakitId = document.getElementById('penyakit-select')?.value ?? "";
 
-    // Loop tiap select
-    selects.forEach(select => {
-        const currentValue = select.value; // value select ini sendiri
+        // gejala yang sudah ada di DB untuk penyakit ini
+        const alreadyInDb = (penyakitId && existingMap[penyakitId])
+            ? existingMap[penyakitId].map(String)
+            : [];
 
-        Array.from(select.options).forEach(option => {
-            if (option.value === "") return; // skip placeholder
+        const selects = document.querySelectorAll('.gejala-select');
 
-            // Kalau option sudah dipakai di select lain → disable
-            if (selectedValues.includes(option.value) && option.value !== currentValue) {
-                option.disabled = true;
-                option.style.color = "#999"; // abu-abu
-            } else {
-                option.disabled = false;
-                option.style.color = "#000";
+        // gejala yang sudah dipilih di form (untuk cegah double antar row)
+        const selectedValues = Array.from(selects)
+            .map(s => s.value)
+            .filter(v => v !== "")
+            .map(String);
+
+        selects.forEach(select => {
+            const currentValue = String(select.value || "");
+
+            Array.from(select.options).forEach(option => {
+                if (option.value === "") return;
+
+                const val = String(option.value);
+
+                const disabledByDb  = alreadyInDb.includes(val);
+                const disabledByRow = selectedValues.includes(val) && val !== currentValue;
+
+                if (disabledByDb || disabledByRow) {
+                    option.disabled = true;
+                    option.style.color = "#999";
+                } else {
+                    option.disabled = false;
+                    option.style.color = "#000";
+                }
+            });
+
+            // kalau sedang terpilih tapi ternyata sudah ada di DB → reset
+            if (currentValue && alreadyInDb.includes(currentValue)) {
+                select.value = "";
             }
         });
+    }
+
+    document.addEventListener('DOMContentLoaded', refreshGejalaOptions);
+
+    document.addEventListener('change', function(e) {
+        if (e.target.id === 'penyakit-select' || e.target.classList.contains('gejala-select')) {
+            refreshGejalaOptions();
+        }
     });
-}
 
-// Jalan saat halaman baru selesai load
-document.addEventListener('DOMContentLoaded', function () {
-    updateDisabledOptions();
-});
+    let index = 1;
 
-// Jalan tiap kali ada perubahan di select gejala
-document.addEventListener('change', function (e) {
-    if (e.target.classList.contains('gejala-select')) {
-        updateDisabledOptions();
+    function tambahGejala() {
+        let wrapper = document.getElementById('gejala-wrapper');
+
+        let html = `
+        <div class="gejala-row">
+            <select name="gejalas[${index}][gejala_id]" class="gejala-select" required>
+                <option value="">-- Pilih Gejala --</option>
+                @foreach($gejalas as $g)
+                    <option value="{{ $g->id }}">{{ $g->kode_gejala }} - {{ $g->nama_gejala }}</option>
+                @endforeach
+            </select>
+
+            <select name="gejalas[${index}][cf_value]" class="cf-select" required>
+                <option value="">-- Bobot CF --</option>
+                <option value="0">0 - Tidak</option>
+                <option value="0.2">0.2 - Sedikit Yakin</option>
+                <option value="0.4">0.4 - Cukup Yakin</option>
+                <option value="0.6">0.6 - Hampir Yakin</option>
+                <option value="0.8">0.8 - Yakin</option>
+                <option value="1">1 - Sangat Yakin</option>
+            </select>
+
+            <button type="button" class="btn-delete" onclick="hapusBaris(this)">✕</button>
+        </div>
+        `;
+
+        wrapper.insertAdjacentHTML('beforeend', html);
+        index++;
+
+        // ✅ refresh supaya option yang sudah ada / sudah dipilih jadi disabled
+        refreshGejalaOptions();
     }
-});
-</script>
 
-<script>
-let index = 1;
+    function hapusBaris(btn) {
+        let wrapper = document.getElementById('gejala-wrapper');
+        let rows = wrapper.querySelectorAll('.gejala-row');
 
-function tambahGejala() {
-    let wrapper = document.getElementById('gejala-wrapper');
-
-    let html = `
-    <div class="gejala-row">
-        <select name="gejalas[${index}][gejala_id]" class="gejala-select" required>
-            <option value="">-- Pilih Gejala --</option>
-            @foreach($gejalas as $g)
-                <option value="{{ $g->id }}">{{ $g->kode_gejala }} - {{ $g->nama_gejala }}</option>
-            @endforeach
-        </select>
-
-        <select name="gejalas[${index}][cf_value]" class="cf-select" required>
-            <option value="">-- Bobot CF --</option>
-            <option value="0">0 - Tidak</option>
-            <option value="0.2">0.2 - Sedikit Yakin</option>
-            <option value="0.4">0.4 - Cukup Yakin</option>
-            <option value="0.6">0.6 - Hampir Yakin</option>
-            <option value="0.8">0.8 - Yakin</option>
-            <option value="1">1 - Sangat Yakin</option>
-        </select>
-
-        <button type="button" class="btn-delete" onclick="hapusBaris(this)">✕</button>
-    </div>
-    `;
-
-    wrapper.insertAdjacentHTML('beforeend', html);
-    index++;
-
-    // setelah nambah row → update disabled option
-    updateDisabledOptions();
-}
-
-function hapusBaris(btn) {
-    let wrapper = document.getElementById('gejala-wrapper');
-    let rows = wrapper.querySelectorAll('.gejala-row');
-
-    if (rows.length > 1) {
-        btn.closest('.gejala-row').remove();
-        // setelah hapus row → update lagi
-        updateDisabledOptions();
-    } else {
-        alert('Minimal harus ada 1 gejala!');
+        if (rows.length > 1) {
+            btn.closest('.gejala-row').remove();
+            refreshGejalaOptions();
+        } else {
+            alert('Minimal harus ada 1 gejala!');
+        }
     }
-}
 </script>
 
 @endsection

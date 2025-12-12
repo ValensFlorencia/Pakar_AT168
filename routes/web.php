@@ -51,6 +51,9 @@ Route::middleware(['auth'])->group(function () {
     'update'  => 'basis_pengetahuan_cf.update',
     'destroy' => 'basis_pengetahuan_cf.destroy',
     ]);
+    // ✅ DETAIL PER PENYAKIT
+    Route::get('/basis-cf/penyakit/{penyakit}', [BasisPengetahuanCFController::class, 'detailPenyakitCF'])
+        ->name('basis_pengetahuan_cf.detail_penyakit');
 
     // ====================================
     // BASIS PENGETAHUAN DEMPSTER SHAFER
@@ -62,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     'edit'    => 'basis_pengetahuan_ds.edit',
     'update'  => 'basis_pengetahuan_ds.update',
     'destroy' => 'basis_pengetahuan_ds.destroy',
-]);
+    ]);
 
     // =====================
     // PROFILE (opsional)

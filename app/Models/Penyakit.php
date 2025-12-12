@@ -14,4 +14,8 @@ class Penyakit extends Model
         'deskripsi',
         'solusi',
     ];
+    public function basisCF()
+    {
+        return $this->hasMany(\App\Models\BasisPengetahuanCF::class, 'penyakit_id');
+    }
 }

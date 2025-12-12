@@ -8,46 +8,62 @@ use App\Models\Gejala;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-
 class BasisPengetahuanCFController extends Controller
 {
+    // ✅ INDEX: tampil per penyakit saja (ada tombol detail)
     public function index()
     {
-        $basisCF = BasisPengetahuanCF::with(['penyakit', 'gejala'])->get();
+        $penyakits = Penyakit::withCount('basisCF')
+            ->having('basis_c_f_count', '>', 0)
+            ->orderBy('kode_penyakit')
+            ->get();
 
-        return view('basis_pengetahuan_cf.index', compact('basisCF'));
+        return view('basis_pengetahuan_cf.index', compact('penyakits'));
     }
 
+    // ✅ DETAIL: tampil semua gejala + bobot untuk 1 penyakit
+    public function detailPenyakitCF(Penyakit $penyakit)
+    {
+        $rules = BasisPengetahuanCF::with('gejala')
+            ->where('penyakit_id', $penyakit->id)
+            ->orderBy('gejala_id')
+            ->get();
+
+        return view('basis_pengetahuan_cf.detailPenyakitCF', compact('penyakit', 'rules'));
+    }
 
     public function create()
     {
         $penyakits = Penyakit::orderBy('kode_penyakit')->get();
         $gejalas   = Gejala::orderBy('kode_gejala')->get();
 
-        return view('basis_pengetahuan_cf.create', compact('penyakits','gejalas'));
+        // ✅ mapping penyakit_id => [gejala_id...]
+        // cast ke string biar JS cocok 100%
+        $existingMap = BasisPengetahuanCF::select('penyakit_id', 'gejala_id')
+            ->get()
+            ->groupBy('penyakit_id')
+            ->map(fn ($rows) => $rows->pluck('gejala_id')->map(fn ($id) => (string) $id)->values())
+            ->toArray();
+
+        return view('basis_pengetahuan_cf.create', compact('penyakits', 'gejalas', 'existingMap'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'penyakit_id' => 'required|exists:penyakits,id',   // sesuaikan dengan nama tabelmu
-            'gejalas'     => 'required|array',
+            'penyakit_id' => 'required|exists:penyakits,id',
+            'gejalas'     => 'required|array|min:1',
 
-            // VALIDASI GEJALA
             'gejalas.*.gejala_id' => [
                 'required',
-                'exists:gejala,id',    // sesuaikan: table "gejala"
-                'distinct',            // ❌ tidak boleh sama dalam 1 form
-                Rule::unique('basis_pengetahuan_cf', 'gejala_id') // ❌ tidak boleh sama di DB
-                    ->where(function ($query) use ($request) {
-                        return $query->where('penyakit_id', $request->penyakit_id);
-                    }),
+                'exists:gejala,id', // ✅ TABEL GEJALA = gejala
+                'distinct',
+                Rule::unique('basis_pengetahuan_cf', 'gejala_id')
+                    ->where(fn ($q) => $q->where('penyakit_id', $request->penyakit_id)),
             ],
 
-            // VALIDASI BOBOT
-            'gejalas.*.cf_value'  => 'required|numeric|min:0|max:1',
+            'gejalas.*.cf_value' => 'required|numeric|min:0|max:1',
         ], [
-            // pesan error custom biar lebih jelas (opsional)
             'gejalas.*.gejala_id.distinct' => 'Gejala tidak boleh diulang dalam satu penyakit.',
             'gejalas.*.gejala_id.unique'   => 'Gejala tersebut sudah terdaftar untuk penyakit ini.',
         ]);
@@ -60,11 +76,9 @@ class BasisPengetahuanCFController extends Controller
             ]);
         }
 
-        return redirect()
-            ->route('basis_pengetahuan_cf.index')
+        return redirect()->route('basis_pengetahuan_cf.index')
             ->with('success', 'Basis Pengetahuan CF berhasil disimpan.');
     }
-
 
     public function edit(BasisPengetahuanCF $basis_cf)
     {
@@ -78,45 +92,27 @@ class BasisPengetahuanCFController extends Controller
         ]);
     }
 
-
     public function update(Request $request, BasisPengetahuanCF $basis_cf)
     {
         $request->validate([
-            'penyakit_id' => 'required|exists:penyakits,id',   // sesuaikan nama tabel
-            'gejala_id'   => [
-                'required',
-                'exists:gejala,id',                           // sesuaikan nama tabel
-                Rule::unique('basis_pengetahuan_cf', 'gejala_id')
-                    ->where(function ($query) use ($request) {
-                        return $query->where('penyakit_id', $request->penyakit_id);
-                    })
-                    ->ignore($basis_cf->id), // abaikan baris yang sedang diedit
-            ],
-            'cf_value'    => 'required|numeric|min:0|max:1',
-        ], [
-            'gejala_id.unique' => 'Gejala ini sudah terdaftar untuk penyakit tersebut.',
+            'cf_value' => 'required|numeric|min:0|max:1',
         ]);
 
         $basis_cf->update([
-            'penyakit_id' => $request->penyakit_id,
-            'gejala_id'   => $request->gejala_id,
-            'cf_value'    => $request->cf_value,
+            'cf_value' => $request->cf_value,
         ]);
 
-        return redirect()
-            ->route('basis_cf.index')
-            ->with('success', 'Basis Pengetahuan CF berhasil diperbarui.');
+        return redirect()->route('basis_pengetahuan_cf.index')
+            ->with('success', 'Bobot CF berhasil diperbarui.');
     }
+
 
     public function destroy($id)
     {
         $basis = BasisPengetahuanCF::findOrFail($id);
-
         $basis->delete();
 
-        return redirect()
-            ->route('basis_pengetahuan_cf.index')
+        return redirect()->route('basis_pengetahuan_cf.index')
             ->with('success', 'Basis pengetahuan CF berhasil dihapus.');
     }
-
 }
