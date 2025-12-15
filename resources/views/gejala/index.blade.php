@@ -5,108 +5,235 @@
 
 @section('content')
 
+<div class="page-header" style="margin-bottom:30px;">
     <h1 class="page-title">Data Gejala Ayam Petelur</h1>
-    <p class="page-subtitle">
-        Kelola daftar gejala yang digunakan pada proses diagnosa sistem pakar.
-    </p>
+    <p class="page-subtitle">Kelola daftar gejala yang digunakan pada proses diagnosa sistem pakar.</p>
+</div>
 
-    {{-- CARD DAFTAR GEJALA --}}
-    <div style="
-        background: #ffffff;
-        border-radius: 20px;
-        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-        padding: 25px 30px 30px;
-    ">
+<div class="form-card">
 
-        {{-- BARIS ATAS: JUDUL + TOMBOL --}}
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="font-size:18px; font-weight:700; color:#5a4a2a; margin:0;">
+    <div class="card-top">
+        <div>
+            <h2 class="card-title">
+                <i class="fas fa-list-check"></i>
                 Daftar Gejala
             </h2>
-
-            <a href="{{ route('gejala.create') }}"
-               style="
-                    padding:10px 22px;
-                    border-radius:999px;
-                    background:linear-gradient(135deg,#f6b93b,#e58e26);
-                    color:#ffffff;
-                    text-decoration:none;
-                    font-weight:600;
-                    box-shadow:0 4px 15px rgba(246,185,59,0.35);
-               ">
-                + Tambah Gejala
-            </a>
+            <div class="card-subtitle">
+                <i class="fas fa-info-circle"></i>
+                Data gejala yang akan dipakai pada proses diagnosa.
+            </div>
         </div>
 
-        {{-- TABEL --}}
-        <div style="overflow-x:auto;">
-            <table style="width:100%; border-collapse:collapse; font-size:14px;">
-                <thead>
-                <tr style="background:#fff4bf;">
-                    <th style="padding:10px 12px; text-align:left;">#</th>
-                    <th style="padding:10px 12px; text-align:left;">Kode</th>
-                    <th style="padding:10px 12px; text-align:left;">Nama Gejala</th>
-                    <th style="width:130px;">Aksi</th>
-                </tr>
-                </thead>
-                <tbody>
-                @forelse($gejalas as $index => $gejala)
-                    <tr style="background: {{ $index % 2 === 0 ? '#fffef5' : '#fffbe2' }};">
-                        <td style="padding:10px 12px;">{{ $index + 1 }}</td>
-                        <td style="padding:10px 12px; font-weight:600;">{{ $gejala->kode_gejala }}</td>
-                        <td style="padding:10px 12px;">{{ $gejala->nama_gejala }}</td>
-                        <td style="padding:8px 12px;">
-                        <div style="display:flex; gap:8px; justify-content:center;">
+        <a href="{{ route('gejala.create') }}" class="btn btn-submit">
+            <i class="fas fa-plus"></i>
+            Tambah Gejala
+        </a>
+    </div>
 
-                            <a href="{{ route('gejala.edit', $gejala->id) }}"
-                            style="
-                                padding:6px 14px;
-                                border-radius:999px;
-                                background:#f6b93b;
-                                color:#fff;
-                                font-size:13px;
-                                font-weight:600;
-                                text-decoration:none;
-                            ">
-                                Edit
+    <div class="table-wrap">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width:60px; text-align:center;">#</th>
+                    <th style="width:140px;">Kode</th>
+                    <th>Nama Gejala</th>
+                    <th style="width:220px; text-align:center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+            @forelse($gejalas as $index => $gejala)
+                <tr>
+                    <td style="text-align:center;">{{ $index + 1 }}</td>
+                    <td style="font-weight:700;">{{ $gejala->kode_gejala }}</td>
+                    <td>{{ $gejala->nama_gejala }}</td>
+                    <td style="text-align:center;">
+                        <div class="action-group">
+
+                            <a href="{{ route('gejala.edit', $gejala->id) }}" class="btn-mini btn-edit">
+                                <i class="fas fa-pen"></i> Edit
                             </a>
 
                             <form action="{{ route('gejala.destroy', $gejala->id) }}"
-                                method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus gejala ini?');">
+                                  method="POST"
+                                  onsubmit="return confirm('Yakin ingin menghapus gejala ini?');"
+                                  style="margin:0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit"
-                                    style="
-                                        padding:6px 14px;
-                                        border-radius:999px;
-                                        background:#ffcccc;
-                                        color:#b91c1c;
-                                        border:none;
-                                        font-size:13px;
-                                        font-weight:600;
-                                        cursor:pointer;
-                                    ">
-                                    Hapus
+                                <button type="submit" class="btn-mini btn-delete">
+                                    <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </form>
 
                         </div>
                     </td>
-
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" style="padding:14px 12px; text-align:center; color:#6b7280;">
-                            Belum ada data gejala.
-                        </td>
-                    </tr>
-                @endforelse
-                </tbody>
-
-            </table>
-        </div>
-
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="4" class="empty">
+                        Belum ada data gejala.
+                    </td>
+                </tr>
+            @endforelse
+            </tbody>
+        </table>
     </div>
+
+</div>
+
+<style>
+    .form-card{
+        background:#ffffff;
+        border-radius:16px;
+        padding:40px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+        border:1px solid #fde68a;
+        max-width:1800px;
+    }
+
+    .card-top{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        gap:16px;
+        margin-bottom:18px;
+        padding-bottom:18px;
+        border-bottom:1px solid #fde68a;
+    }
+
+    .card-title{
+        margin:0;
+        font-size:18px;
+        font-weight:800;
+        color:#5a4a2a;
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+    .card-title i{ color:#f59e0b; }
+
+    .card-subtitle{
+        margin-top:8px;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        font-size:13px;
+        color:#92400e;
+        opacity:.85;
+    }
+    .card-subtitle i{ font-size:12px; }
+
+    .table-wrap{
+        overflow-x:auto;
+        border-radius:12px;
+        border:1px solid #fde68a;
+        background:#ffffff;
+    }
+
+    .table{
+        width:100%;
+        border-collapse:collapse;
+        font-size:14px;
+        background:white;
+    }
+
+    .table thead{
+        background:#fff9c4;
+    }
+
+    .table th, .table td{
+        padding:12px 12px;
+        text-align:left;
+        vertical-align:top;
+        border-bottom:1px solid #fde68a;
+    }
+
+    .table tbody tr:nth-child(even){ background:#fffef5; }
+    .table tbody tr:hover{ background:#fff9c4; }
+
+    .action-group{
+        display:flex;
+        gap:10px;
+        justify-content:center;
+        align-items:center;
+        flex-wrap:wrap;
+    }
+
+    .empty{
+        text-align:center;
+        padding:22px;
+        color:#8b7355;
+        font-weight:600;
+        background:#fffbeb;
+    }
+
+    /* Buttons */
+    .btn{
+        padding:13px 28px;
+        border:none;
+        border-radius:10px;
+        font-size:15px;
+        font-weight:600;
+        cursor:pointer;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        transition:all .2s ease;
+        white-space:nowrap;
+    }
+
+    .btn-submit{
+        background:#f59e0b; /* SOLID */
+        color:#ffffff;
+        box-shadow:0 4px 12px rgba(245,158,11,0.3);
+    }
+    .btn-submit:hover{
+        background:#d97706;
+        transform:translateY(-2px);
+        box-shadow:0 6px 16px rgba(245,158,11,0.4);
+    }
+
+    .btn-mini{
+        border:none;
+        border-radius:999px;
+        padding:8px 14px;
+        font-size:13px;
+        font-weight:700;
+        cursor:pointer;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        transition:all .2s ease;
+        white-space:nowrap;
+    }
+
+    .btn-edit{
+        background:#f59e0b;
+        color:#fff;
+        box-shadow:0 4px 12px rgba(245,158,11,.22);
+    }
+    .btn-edit:hover{
+        background:#d97706;
+        transform:translateY(-1px);
+    }
+
+    .btn-delete{
+        background:#fef2f2;
+        color:#b91c1c;
+        border:1px solid #fecaca;
+    }
+    .btn-delete:hover{
+        background:#fee2e2;
+        transform:translateY(-1px);
+    }
+
+    @media (max-width:768px){
+        .form-card{ padding:24px; }
+        .card-top{ flex-direction:column; align-items:stretch; }
+        .btn{ width:100%; justify-content:center; }
+        .action-group{ justify-content:flex-start; }
+    }
+</style>
 
 @endsection

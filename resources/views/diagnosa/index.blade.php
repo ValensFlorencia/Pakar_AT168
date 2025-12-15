@@ -4,269 +4,12 @@
 
 @section('content')
 
-<style>
-    .page-title {
-        font-size: 32px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 12px;
-    }
-
-    .page-subtitle {
-        font-size: 16px;
-        color: #7f8c8d;
-        margin-bottom: 30px;
-        line-height: 1.6;
-    }
-
-    .form-card {
-        background: #ffffff;
-        padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-    }
-
-    .form-group {
-        margin-bottom: 30px;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 18px;
-        font-weight: 700;
-        color: #2c3e50;
-        margin-bottom: 20px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .form-label::before {
-        content: "🔍";
-        font-size: 22px;
-    }
-
-    .required-mark {
-        color: #e74c3c;
-        margin-left: 4px;
-    }
-
-    .gejala-container {
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .gejala-row {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 18px 20px;
-        background: #f8f9fa;
-        border: 2px solid #e8ecef;
-        border-radius: 14px;
-        transition: all 0.3s ease;
-    }
-
-    .gejala-row:hover {
-        background: #ffffff;
-        border-color: #3498db;
-        box-shadow: 0 4px 12px rgba(52, 152, 219, 0.15);
-        transform: translateX(4px);
-    }
-
-    .gejala-row.active {
-        background: #e8f4fd;
-        border-color: #3498db;
-        box-shadow: 0 4px 15px rgba(52, 152, 219, 0.2);
-    }
-
-    .checkbox-wrapper {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        flex: 1;
-        margin: 0;
-        cursor: pointer;
-    }
-
-    .cb-gejala {
-        width: 20px;
-        height: 20px;
-        cursor: pointer;
-        accent-color: #3498db;
-        flex-shrink: 0;
-    }
-
-    .gejala-text {
-        font-size: 15px;
-        color: #2c3e50;
-        line-height: 1.5;
-    }
-
-    .gejala-code {
-        font-weight: 700;
-        color: #3498db;
-    }
-
-    .cf-select {
-        padding: 10px 15px;
-        border-radius: 10px;
-        border: 2px solid #dfe4ea;
-        font-size: 14px;
-        min-width: 190px;
-        color: #2c3e50;
-        background: #ffffff;
-        outline: none;
-        transition: all 0.3s ease;
-    }
-
-    .cf-select:disabled {
-        background: #ecf0f1;
-        color: #95a5a6;
-        cursor: not-allowed;
-        opacity: 0.6;
-    }
-
-    .cf-select:not(:disabled) {
-        border-color: #3498db;
-        cursor: pointer;
-    }
-
-    .cf-select:not(:disabled):focus {
-        border-color: #2980b9;
-        box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-    }
-
-    .error-message {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        color: #e74c3c;
-        background: #fee;
-        padding: 12px 16px;
-        border-radius: 10px;
-        margin-top: 15px;
-        font-size: 14px;
-        border-left: 4px solid #e74c3c;
-    }
-
-    .error-message::before {
-        content: "⚠️";
-        font-size: 18px;
-    }
-
-    .info-box {
-        background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-        border: 2px solid #90caf9;
-        border-radius: 14px;
-        padding: 18px 22px;
-        margin-bottom: 25px;
-        display: flex;
-        align-items: start;
-        gap: 12px;
-    }
-
-    .info-box::before {
-        content: "💡";
-        font-size: 24px;
-        flex-shrink: 0;
-    }
-
-    .info-box-text {
-        font-size: 14px;
-        color: #1976d2;
-        line-height: 1.6;
-    }
-
-    .btn-actions {
-        display: flex;
-        gap: 12px;
-        margin-top: 35px;
-        padding-top: 30px;
-        border-top: 2px solid #f0f0f0;
-    }
-
-    .btn-submit {
-        padding: 16px 45px;
-        border-radius: 14px;
-        border: none;
-        background: linear-gradient(135deg, #3498db, #2980b9);
-        color: #ffffff;
-        font-size: 17px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 6px 20px rgba(52, 152, 219, 0.3);
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .btn-submit::before {
-        content: "🔬";
-        font-size: 20px;
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
-        background: linear-gradient(135deg, #2980b9, #1f618d);
-    }
-
-    .btn-submit:active {
-        transform: translateY(-1px);
-    }
-
-    .stats-banner {
-        display: flex;
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-
-    .stat-card {
-        flex: 1;
-        background: linear-gradient(135deg, #fff5e6, #ffe6cc);
-        border: 2px solid #ffcc99;
-        border-radius: 12px;
-        padding: 15px 20px;
-        text-align: center;
-    }
-
-    .stat-number {
-        font-size: 28px;
-        font-weight: 700;
-        color: #e67e22;
-        margin-bottom: 4px;
-    }
-
-    .stat-label {
-        font-size: 13px;
-        color: #d35400;
-        font-weight: 600;
-    }
-
-    @media (max-width: 768px) {
-        .gejala-row {
-            flex-direction: column;
-            align-items: stretch;
-            gap: 12px;
-        }
-
-        .cf-select {
-            min-width: 100%;
-        }
-
-        .stats-banner {
-            flex-direction: column;
-        }
-    }
-</style>
-
-<h1 class="page-title">🐔 Diagnosa Penyakit Ayam</h1>
-<p class="page-subtitle">
-    Pilih gejala yang dialami ayam, lalu tentukan tingkat keyakinan (bobot CF) untuk setiap gejala.
-</p>
+<div class="page-header" style="margin-bottom:30px;">
+    <h1 class="page-title">Diagnosa Penyakit Ayam</h1>
+    <p class="page-subtitle">
+        Pilih gejala yang dialami ayam, lalu tentukan tingkat keyakinan (bobot CF) untuk setiap gejala.
+    </p>
+</div>
 
 <div class="stats-banner">
     <div class="stat-card">
@@ -280,9 +23,12 @@
 </div>
 
 <div class="form-card">
+
     <div class="info-box">
+        <div class="info-icon">💡</div>
         <div class="info-box-text">
-            <strong>Cara Menggunakan:</strong> Centang gejala yang dialami ayam, lalu pilih tingkat keyakinan Anda untuk setiap gejala. Minimal pilih 1 gejala untuk melakukan diagnosa.
+            <b>Cara Menggunakan:</b> Centang gejala yang dialami ayam, lalu pilih bobot CF untuk tiap gejala.
+            Minimal pilih <b>1 gejala</b> untuk melakukan diagnosa.
         </div>
     </div>
 
@@ -290,10 +36,18 @@
         @csrf
 
         <div class="form-group">
-            <label class="form-label">
-                Pilih Gejala & Bobot CF
-                <span class="required-mark">*</span>
-            </label>
+            <div class="form-head">
+                <label class="form-label">
+                    <i class="fas fa-stethoscope"></i>
+                    Pilih Gejala & Bobot CF
+                    <span class="required-mark">*</span>
+                </label>
+
+                <div class="hint-pill">
+                    <i class="fas fa-mouse-pointer"></i>
+                    Pilih gejala, lalu isi bobot CF
+                </div>
+            </div>
 
             <div class="gejala-container">
                 @foreach($gejalas as $g)
@@ -304,7 +58,8 @@
                                    value="{{ $g->id }}"
                                    class="cb-gejala">
                             <span class="gejala-text">
-                                <span class="gejala-code">{{ $g->kode_gejala }}</span> - {{ $g->nama_gejala }}
+                                <span class="gejala-code">{{ $g->kode_gejala }}</span>
+                                <span class="gejala-name">{{ $g->nama_gejala }}</span>
                             </span>
                         </label>
 
@@ -325,18 +80,395 @@
 
             @error('gejala_id')
                 <div class="error-message">
-                    {{ $message }}
+                    ⚠️ {{ $message }}
                 </div>
             @enderror
         </div>
 
         <div class="btn-actions">
-            <button type="submit" class="btn-submit">
+            <button type="submit" class="btn btn-submit">
+                <i class="fas fa-microscope"></i>
                 Proses Diagnosa
             </button>
         </div>
     </form>
 </div>
+
+<style>
+    /* ===== GLOBAL FONT ===== */
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont,
+                    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        letter-spacing: -0.1px;
+    }
+
+    /* ===== PAGE HEADER ===== */
+    .page-title {
+        font-size: 30px;
+        font-weight: 800;
+        color: #1f2937; /* slate-800 */
+        letter-spacing: -0.4px;
+    }
+
+    .page-subtitle {
+        font-size: 15px;
+        font-weight: 500;
+        color: #6b7280; /* gray-500 */
+        line-height: 1.7;
+    }
+
+    /* ===== CARD ===== */
+    .form-card {
+        font-size: 14px;
+        color: #374151; /* gray-700 */
+    }
+
+    /* ===== FORM ===== */
+    .form-label {
+        font-size: 17px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+
+    .hint-pill {
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    /* ===== INFO BOX ===== */
+    .info-box-text {
+        font-size: 14px;
+        font-weight: 500;
+        color: #4b5563;
+    }
+
+    /* ===== STATS ===== */
+    .stat-number {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.3px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.2px;
+    }
+
+    /* ===== GEJALA LIST ===== */
+    .gejala-name {
+        font-size: 14px;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .gejala-code {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    /* ===== SELECT ===== */
+    .cf-select {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* ===== BUTTON ===== */
+    .btn-submit {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+
+    /* ===== ERROR ===== */
+    .error-message {
+        font-size: 13px;
+        font-weight: 600;
+    }
+
+    /* Selaras style (Basis CF/DS & Riwayat) */
+    .form-card{
+        background:#ffffff;
+        border-radius:16px;
+        padding:40px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
+        border:1px solid #fde68a;
+        max-width:1800px;
+        margin:0 auto;
+    }
+
+    .form-group{ margin:0; }
+
+    .form-head{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:14px;
+        margin-bottom:16px;
+        flex-wrap:wrap;
+    }
+
+    .form-label{
+        margin:0;
+        font-size:18px;
+        font-weight:900;
+        color:#78350f;
+        display:flex;
+        align-items:center;
+        gap:10px;
+    }
+    .form-label i{ color:#f59e0b; }
+
+    .required-mark{ color:#ef4444; margin-left:4px; font-weight:900; }
+
+    .hint-pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 12px;
+        border-radius:999px;
+        background:#fffbeb;
+        border:1px solid #fde68a;
+        color:#92400e;
+        font-weight:800;
+        font-size:13px;
+        white-space:nowrap;
+    }
+    .hint-pill i{ color:#f59e0b; }
+
+    /* Info box */
+    .info-box{
+        background:#fffbeb;
+        border:1px solid #fde68a;
+        border-radius:14px;
+        padding:16px 18px;
+        margin-bottom:18px;
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+    }
+    .info-icon{
+        width:36px;
+        height:36px;
+        border-radius:12px;
+        background:#fff9c4;
+        border:1px solid #fde68a;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:18px;
+        flex-shrink:0;
+    }
+    .info-box-text{
+        font-size:14px;
+        color:#92400e;
+        line-height:1.6;
+        font-weight:600;
+    }
+
+    /* Stats */
+    .stats-banner{
+        display:flex;
+        gap:14px;
+        margin-bottom:18px;
+        max-width:1800px;
+        margin-left:auto;
+        margin-right:auto;
+    }
+    .stat-card{
+        flex:1;
+        background:#ffffff;
+        border:1px solid #fde68a;
+        border-radius:14px;
+        padding:14px 18px;
+        box-shadow:0 4px 16px rgba(0,0,0,0.05);
+        text-align:left;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+    }
+    .stat-number{
+        font-size:26px;
+        font-weight:900;
+        color:#78350f;
+        line-height:1;
+    }
+    .stat-label{
+        font-size:13px;
+        color:#92400e;
+        font-weight:800;
+        opacity:.9;
+        text-align:right;
+    }
+
+    /* Gejala list */
+    .gejala-container{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+    }
+
+    .gejala-row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:14px;
+        padding:14px 16px;
+        background:#fffef5;
+        border:1px solid #fde68a;
+        border-radius:14px;
+        transition:all .18s ease;
+    }
+
+    .gejala-row:hover{
+        background:#fff9c4;
+        transform: translateY(-1px);
+        box-shadow:0 6px 18px rgba(245,158,11,0.12);
+    }
+
+    .gejala-row.active{
+        background:#fffbeb;
+        border-color:#f59e0b;
+        box-shadow:0 8px 22px rgba(245,158,11,0.18);
+    }
+
+    .checkbox-wrapper{
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+        flex:1;
+        margin:0;
+        cursor:pointer;
+        user-select:none;
+    }
+
+    .cb-gejala{
+        width:20px;
+        height:20px;
+        cursor:pointer;
+        accent-color:#f59e0b;
+        flex-shrink:0;
+        margin-top:2px;
+    }
+
+    .gejala-text{
+        display:flex;
+        align-items:baseline;
+        flex-wrap:wrap;
+        gap:10px;
+        line-height:1.5;
+    }
+
+    .gejala-code{
+        display:inline-flex;
+        align-items:center;
+        padding:4px 10px;
+        border-radius:999px;
+        background:#ffffff;
+        border:1px solid #fde68a;
+        color:#78350f;
+        font-weight:900;
+        font-size:12px;
+        white-space:nowrap;
+    }
+
+    .gejala-name{
+        font-size:14px;
+        color:#78350f;
+        font-weight:700;
+    }
+
+    /* Select */
+    .cf-select{
+        padding:10px 12px;
+        border-radius:12px;
+        border:1.8px solid #fde68a;
+        font-size:14px;
+        min-width:220px;
+        color:#78350f;
+        background:#ffffff;
+        outline:none;
+        transition:all .15s ease;
+        font-weight:800;
+    }
+
+    .cf-select:disabled{
+        background:#f9fafb;
+        color:#9ca3af;
+        cursor:not-allowed;
+        opacity:.85;
+        border-color:#fde68a;
+    }
+
+    .cf-select:not(:disabled):focus{
+        border-color:#f59e0b;
+        box-shadow:0 0 0 4px rgba(245,158,11,0.18);
+    }
+
+    /* Error */
+    .error-message{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        color:#7f1d1d;
+        background:#fef2f2;
+        padding:12px 14px;
+        border-radius:12px;
+        margin-top:14px;
+        font-size:14px;
+        border:1px solid #fecaca;
+        font-weight:800;
+    }
+
+    /* Actions */
+    .btn-actions{
+        display:flex;
+        gap:12px;
+        margin-top:22px;
+        padding-top:20px;
+        border-top:1px solid #fde68a;
+        justify-content:flex-end;
+    }
+
+    .btn{
+        padding:12px 18px;
+        border:none;
+        border-radius:12px;
+        font-size:14px;
+        font-weight:900;
+        cursor:pointer;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        gap:10px;
+        transition:all .2s ease;
+        white-space:nowrap;
+    }
+
+    .btn-submit{
+        background:#f59e0b;
+        color:#ffffff;
+        box-shadow:0 4px 12px rgba(245,158,11,0.25);
+    }
+
+    .btn-submit:hover{
+        background:#d97706;
+        transform: translateY(-1px);
+        box-shadow:0 6px 16px rgba(245,158,11,0.35);
+    }
+
+    @media (max-width: 768px){
+        .form-card{ padding:24px; }
+        .stats-banner{ flex-direction:column; }
+        .gejala-row{ flex-direction:column; align-items:stretch; }
+        .cf-select{ min-width:100%; }
+        .btn-actions{ justify-content:stretch; }
+        .btn{ width:100%; justify-content:center; }
+        .stat-label{ text-align:left; }
+    }
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -347,7 +479,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateSelectedCount() {
         const checkedCount = document.querySelectorAll('.cb-gejala:checked').length;
         selectedCountEl.textContent = checkedCount;
-        selectedCountEl.style.color = checkedCount > 0 ? '#27ae60' : '#e67e22';
+        selectedCountEl.style.color = checkedCount > 0 ? '#16a34a' : '#78350f';
     }
 
     // Handle checkbox change
@@ -387,9 +519,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (!select.value) {
                 allValid = false;
-                select.style.borderColor = '#e74c3c';
+                select.style.borderColor = '#ef4444';
                 setTimeout(() => {
-                    select.style.borderColor = '#3498db';
+                    select.style.borderColor = '#fde68a';
                 }, 2000);
             }
         });

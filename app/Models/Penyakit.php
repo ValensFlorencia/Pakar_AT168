@@ -18,4 +18,9 @@ class Penyakit extends Model
     {
         return $this->hasMany(\App\Models\BasisPengetahuanCF::class, 'penyakit_id');
     }
+    public function basisDS()
+    {
+        return $this->hasMany(\App\Models\BasisPengetahuanDS::class, 'penyakit_id');
+    }
+
 }

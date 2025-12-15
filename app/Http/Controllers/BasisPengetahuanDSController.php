@@ -10,12 +10,27 @@ use Illuminate\Validation\Rule;
 
 class BasisPengetahuanDSController extends Controller
 {
+    // ✅ INDEX: tampil per penyakit saja (ada tombol detail)
     public function index()
     {
-        // sama seperti CF: load relasi penyakit & gejala
-        $basisDS = BasisPengetahuanDS::with(['penyakit', 'gejala'])->get();
+        $penyakits = Penyakit::withCount('basisDS')
+            ->having('basis_d_s_count', '>', 0)
+            ->orderBy('kode_penyakit')
+            ->get();
 
-        return view('basis_pengetahuan_ds.index', compact('basisDS'));
+        return view('basis_pengetahuan_ds.index', compact('penyakits'));
+
+    }
+
+    // ✅ DETAIL: tampil semua gejala + bobot untuk 1 penyakit
+    public function detailPenyakitDS(Penyakit $penyakit)
+    {
+        $rules = BasisPengetahuanDS::with('gejala')
+            ->where('penyakit_id', $penyakit->id)
+            ->orderBy('gejala_id')
+            ->get();
+
+        return view('basis_pengetahuan_ds.detail', compact('penyakit', 'rules'));
     }
 
     public function create()
@@ -23,93 +38,76 @@ class BasisPengetahuanDSController extends Controller
         $penyakits = Penyakit::orderBy('kode_penyakit')->get();
         $gejalas   = Gejala::orderBy('kode_gejala')->get();
 
-        return view('basis_pengetahuan_ds.create', compact('penyakits', 'gejalas'));
+        // mapping penyakit_id => [gejala_id...]
+        $existingMap = BasisPengetahuanDS::select('penyakit_id', 'gejala_id')
+            ->get()
+            ->groupBy('penyakit_id')
+            ->map(fn ($rows) => $rows->pluck('gejala_id')->map(fn ($id) => (string) $id)->values())
+            ->toArray();
+
+        return view('basis_pengetahuan_ds.create', compact('penyakits', 'gejalas', 'existingMap'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'penyakit_id' => 'required|exists:penyakits,id',
-            'gejalas'     => 'required|array',
+            'gejalas'     => 'required|array|min:1',
 
-            // VALIDASI GEJALA
             'gejalas.*.gejala_id' => [
                 'required',
                 'exists:gejala,id',
-                'distinct',   // tidak boleh dobel dalam 1 form
+                'distinct',
                 Rule::unique('basis_pengetahuan_ds', 'gejala_id')
-                    ->where(function ($query) use ($request) {
-                        return $query->where('penyakit_id', $request->penyakit_id);
-                    }),
+                    ->where(fn ($q) => $q->where('penyakit_id', $request->penyakit_id)),
             ],
 
-            // VALIDASI BOBOT DS
-            'gejalas.*.ds_value'  => 'required|numeric|min:0|max:1',
+            'gejalas.*.ds_value' => 'required|numeric|min:0|max:1',
         ], [
             'gejalas.*.gejala_id.distinct' => 'Gejala tidak boleh diulang dalam satu penyakit.',
-            'gejalas.*.gejala_id.unique'   => 'Gejala tersebut sudah terdaftar untuk penyakit ini (DS).',
+            'gejalas.*.gejala_id.unique'   => 'Gejala tersebut sudah terdaftar untuk penyakit ini.',
         ]);
 
         foreach ($request->gejalas as $item) {
             BasisPengetahuanDS::create([
                 'penyakit_id' => $request->penyakit_id,
                 'gejala_id'   => $item['gejala_id'],
-                'ds_value'    => $item['ds_value'],   // pastikan nama kolom di tabel DS
+                'ds_value'    => $item['ds_value'],
             ]);
         }
 
-        return redirect()
-            ->route('basis_pengetahuan_ds.index')
+        return redirect()->route('basis_pengetahuan_ds.index')
             ->with('success', 'Basis Pengetahuan DS berhasil disimpan.');
     }
 
-    public function edit(BasisPengetahuanDS $basis_d)
+    public function edit(BasisPengetahuanDS $basis_ds)
     {
-        $penyakits = Penyakit::orderBy('kode_penyakit')->get();
-        $gejalas   = Gejala::orderBy('kode_gejala')->get();
-
         return view('basis_pengetahuan_ds.edit', [
-            'basisDS'   => $basis_d,
-            'penyakits' => $penyakits,
-            'gejalas'   => $gejalas,
+            'basisDS' => $basis_ds,
         ]);
     }
 
-    public function update(Request $request, BasisPengetahuanDS $basis_d)
+    // ✅ edit hanya bobot (penyakit & gejala tidak berubah)
+    public function update(Request $request, BasisPengetahuanDS $basis_ds)
     {
         $request->validate([
-            'penyakit_id' => 'required|exists:penyakits,id',
-            'gejala_id'   => [
-                'required',
-                'exists:gejala,id',
-                Rule::unique('basis_pengetahuan_ds', 'gejala_id')
-                    ->where(function ($query) use ($request) {
-                        return $query->where('penyakit_id', $request->penyakit_id);
-                    })
-                    ->ignore($basis_d->id),
-            ],
-            'ds_value'    => 'required|numeric|min:0|max:1',
-        ], [
-            'gejala_id.unique' => 'Gejala ini sudah terdaftar untuk penyakit tersebut (DS).',
+            'ds_value' => 'required|numeric|min:0|max:1',
         ]);
 
-        $basis_d->update([
-            'penyakit_id' => $request->penyakit_id,
-            'gejala_id'   => $request->gejala_id,
-            'ds_value'    => $request->ds_value,
+        $basis_ds->update([
+            'ds_value' => $request->ds_value,
         ]);
 
-        return redirect()
-            ->route('basis_pengetahuan_ds.index')
-            ->with('success', 'Basis Pengetahuan DS berhasil diperbarui.');
+        return redirect()->route('basis_pengetahuan_ds.index')
+            ->with('success', 'Bobot DS berhasil diperbarui.');
     }
 
-    public function destroy(BasisPengetahuanDS $basis_d)
+    public function destroy($id)
     {
-        $basis_d->delete();
+        $basis = BasisPengetahuanDS::findOrFail($id);
+        $basis->delete();
 
-        return redirect()
-            ->route('basis_pengetahuan_ds.index')
-            ->with('success', 'Basis DS berhasil dihapus.');
+        return redirect()->route('basis_pengetahuan_ds.index')
+            ->with('success', 'Basis pengetahuan DS berhasil dihapus.');
     }
 }

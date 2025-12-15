@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sistem Pakar Ayam')</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -23,7 +25,7 @@
             min-height: 100vh;
         }
 
-        /* ================= SIDEBAR ================= */
+        /* ================= SIDEBAR - FIXED POSITION ================= */
         .sidebar {
             width: 260px;
             background: #ffd93d;
@@ -32,6 +34,12 @@
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             display: flex;
             flex-direction: column;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            overflow-y: auto;
+            z-index: 1000;
         }
 
         .logo {
@@ -40,18 +48,28 @@
             border-bottom: 2px solid rgba(255,255,255,0.45);
         }
 
-        .logo h1 {
-            font-size: 18px;
-            font-weight: 700;
+        .logo{
+            padding: 20px 22px;
+            background: transparent;
+            border-bottom: 2px solid rgba(255,255,255,0.45);
+
+            /* ✅ bikin judul di tengah */
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 8px;
-            color: #5a4a2a;
         }
 
-        .logo h1 span {
-            font-size: 20px;
+        .logo h1{
+            font-size: 18px;
+            font-weight: 700;
+            color: #5a4a2a;
+
+            /* ✅ center */
+            width: 100%;
+            text-align: center;
+            justify-content: center;
         }
+
 
         .sidebar-section {
             padding: 18px 0 6px;
@@ -80,8 +98,10 @@
             transition: 0.25s ease;
         }
 
-        .menu-item span.icon {
+        .menu-item i {
             width: 20px;
+            text-align: center;
+            color: #5a4a2a;
         }
 
         .menu-item:hover {
@@ -95,17 +115,49 @@
             font-weight: 600;
         }
 
-        /* ================= MAIN AREA ================= */
+        /* ✅ SIDEBAR FOOTER UNTUK LOGOUT DI BAWAH */
+        .sidebar-footer {
+            margin-top: auto;
+            padding: 18px 22px;
+            border-top: 2px solid rgba(255,255,255,0.45);
+        }
+
+        .sidebar-logout {
+            width: 100%;
+            background: #b45309;
+            color: #fff;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 18px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(180, 83, 9, 0.35);
+            transition: 0.25s ease;
+        }
+
+        .sidebar-logout:hover {
+            background: #92400e;
+            transform: translateY(-1px);
+        }
+
+        /* ================= MAIN AREA - DENGAN MARGIN LEFT ================= */
         .main-content {
             flex: 1;
             background: #fff8e1;
             display: flex;
             flex-direction: column;
+            margin-left: 260px;
+            width: calc(100% - 260px);
         }
 
         /* HEADER */
         .header {
-            background: #fff8e1 ;
+            background: #fff8e1;
             padding: 16px 40px;
             display: flex;
             justify-content: flex-end;
@@ -114,26 +166,29 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
 
-        .logout-btn {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 6px 20px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 13px;
-            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
-            transition: 0.25s ease;
-            display: inline-flex;
+        /* ✅ PROFILE DI HEADER */
+        .profile-box {
+            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 12px;
         }
 
-        .logout-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 18px rgba(231, 76, 60, 0.45);
-            background: #c0392b;
+        .profile-name {
+            font-size: 14px;
+            color: #5a4a2a;
+            font-weight: 600;
+        }
+
+        .profile-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #fde68a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #854d0e;
         }
 
         /* ================= CONTENT ================= */
@@ -291,22 +346,35 @@
         }
 
         @media (max-width: 768px) {
-            .sidebar { width: 80px; }
-            .logo h1 span.text { display: none; }
-            .sidebar-title { display: none; }
-            .menu-item span.label { display: none; }
-            .content { padding: 24px; }
+            .sidebar {
+                width: 80px;
+            }
+            .main-content {
+                margin-left: 80px;
+                width: calc(100% - 80px);
+            }
+            .logo h1 span.text {
+                display: none;
+            }
+            .sidebar-title {
+                display: none;
+            }
+            .menu-item span.label {
+                display: none;
+            }
+            .content {
+                padding: 24px;
+            }
         }
     </style>
 </head>
 <body>
 <div class="container">
 
-    {{-- SIDEBAR SATU UNTUK SEMUA HALAMAN --}}
+    {{-- SIDEBAR FIXED - TIDAK AKAN SCROLL --}}
     <div class="sidebar">
         <div class="logo">
             <h1>
-                <span>🐔</span>
                 <span class="text">Sistem Pakar</span>
             </h1>
         </div>
@@ -315,7 +383,7 @@
             <div class="sidebar-title">MASTER</div>
             <a href="{{ route('dashboard') }}"
                class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                <span class="icon">📊</span>
+                <i class="fas fa-chart-line"></i>
                 <span class="label">Dashboard</span>
             </a>
         </div>
@@ -325,25 +393,25 @@
 
             <a href="{{ route('gejala.index') }}"
                class="menu-item {{ request()->is('gejala*') ? 'active' : '' }}">
-                <span class="icon">⚙️</span>
+                <i class="fas fa-stethoscope"></i>
                 <span class="label">Data Gejala</span>
             </a>
 
             <a href="{{ route('penyakit.index') }}"
                class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
-                <span class="icon">🦠</span>
+                <i class="fas fa-virus"></i>
                 <span class="label">Data Penyakit</span>
             </a>
 
             <a href="{{ route('basis_pengetahuan_cf.index') }}"
                class="menu-item {{ request()->is('basis-cf*') ? 'active' : '' }}">
-                <span class="icon">🧠</span>
+                <i class="fas fa-brain"></i>
                 <span class="label">Basis Pengetahuan CF</span>
             </a>
 
             <a href="{{ route('basis_pengetahuan_ds.index') }}"
                class="menu-item {{ request()->is('basis-ds*') ? 'active' : '' }}">
-                <span class="icon">🧠</span>
+                <i class="fas fa-network-wired"></i>
                 <span class="label">Basis Pengetahuan DS</span>
             </a>
         </div>
@@ -353,21 +421,52 @@
 
             <a href="{{ route('diagnosa.index') }}"
                class="menu-item {{ request()->is('diagnosa*') ? 'active' : '' }}">
-                <span class="icon">🩺</span>
+                <i class="fas fa-heartbeat"></i>
                 <span class="label">Diagnosa Penyakit</span>
             </a>
+
+            <a href="{{ route('riwayat-diagnosa.index') }}"
+               class="menu-item {{ request()->is('riwayat-diagnosa*') ? 'active' : '' }}">
+                <i class="fas fa-history"></i>
+                <span class="label">Riwayat Diagnosa</span>
+            </a>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">ROLE</div>
+
+            <a href="{{ route('users.index') }}"
+               class="menu-item {{ request()->is('users*') ? 'active' : '' }}">
+                <i class="fas fa-users"></i>
+                <span class="label">Pengguna</span>
+            </a>
+        </div>
+
+        {{-- ✅ LOGOUT PALING BAWAH SIDEBAR --}}
+        <div class="sidebar-footer">
+            <form action="{{ route('logout') }}" method="POST">
+                @csrf
+                <button type="submit" class="sidebar-logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                    Logout
+                </button>
+            </form>
         </div>
     </div>
 
-    {{-- MAIN AREA --}}
+    {{-- MAIN AREA - DENGAN MARGIN LEFT --}}
     <div class="main-content">
+
+        {{-- ✅ HEADER SEKARANG PROFILE (Bukan Logout) --}}
         <div class="header">
-            <form action="{{ route('logout') }}" method="POST">
-                @csrf
-                <button type="submit" class="logout-btn">
-                    🚪 Logout
-                </button>
-            </form>
+            <div class="profile-box">
+                <span class="profile-name">
+                    <i class="fas fa-user-circle"></i> {{ Auth::check() ? Auth::user()->name : 'Guest' }}
+                </span>
+                <div class="profile-avatar">
+                    {{ strtoupper(substr(Auth::check() ? Auth::user()->name : 'G', 0, 1)) }}
+                </div>
+            </div>
         </div>
 
         <div class="content">

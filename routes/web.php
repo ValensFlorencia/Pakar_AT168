@@ -7,8 +7,9 @@ use App\Http\Controllers\GejalaController;
 use App\Http\Controllers\BasisPengetahuanCFController;
 use App\Http\Controllers\BasisPengetahuanDSController;
 use App\Http\Controllers\DiagnosaController;
-
-
+use App\Http\Controllers\RiwayatDiagnosaController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\DashboardController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes (Clean Version)
@@ -25,9 +26,11 @@ Route::redirect('/', '/login');
 Route::middleware(['auth'])->group(function () {
 
     // DASHBOARD
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+        ->name('dashboard');
+
 
     // =====================
     // DATA PENYAKIT (CRUD)
@@ -58,15 +61,26 @@ Route::middleware(['auth'])->group(function () {
     // ====================================
     // BASIS PENGETAHUAN DEMPSTER SHAFER
     // ====================================
-    Route::resource('basis-ds', BasisPengetahuanDSController::class)->names([
-    'index'   => 'basis_pengetahuan_ds.index',
-    'create'  => 'basis_pengetahuan_ds.create',
-    'store'   => 'basis_pengetahuan_ds.store',
-    'edit'    => 'basis_pengetahuan_ds.edit',
-    'update'  => 'basis_pengetahuan_ds.update',
-    'destroy' => 'basis_pengetahuan_ds.destroy',
+    Route::resource('basis-ds', BasisPengetahuanDSController::class)
+    ->parameters(['basis-ds' => 'basis_ds'])
+    ->names([
+        'index'   => 'basis_pengetahuan_ds.index',
+        'create'  => 'basis_pengetahuan_ds.create',
+        'store'   => 'basis_pengetahuan_ds.store',
+        'edit'    => 'basis_pengetahuan_ds.edit',
+        'update'  => 'basis_pengetahuan_ds.update',
+        'destroy' => 'basis_pengetahuan_ds.destroy',
     ]);
 
+    Route::get('/basis-ds/penyakit/{penyakit}', [BasisPengetahuanDSController::class, 'detailPenyakitDS'])
+    ->name('basis_pengetahuan_ds.detail_penyakit');
+
+    // =====================
+    // RIWAYAT DIAGNOSA
+    // =====================
+    Route::post('/diagnosa/proses', [DiagnosaController::class, 'proses'])->name('diagnosa.proses');
+    Route::get('/riwayat-diagnosa', [RiwayatDiagnosaController::class, 'index'])->name('riwayat-diagnosa.index');
+    Route::get('/riwayat-diagnosa/{riwayat}', [RiwayatDiagnosaController::class, 'show'])->name('riwayat-diagnosa.show');
     // =====================
     // PROFILE (opsional)
     // =====================
@@ -80,3 +94,6 @@ Route::middleware(['auth'])->group(function () {
 
 // ROUTE LOGIN/LOGOUT ADA DI auth.php
 require __DIR__ . '/auth.php';
+Route::middleware(['auth'])->group(function () {
+    Route::resource('users', UserController::class);
+});
