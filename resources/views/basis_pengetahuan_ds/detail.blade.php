@@ -11,10 +11,19 @@
     </p>
 </div>
 
-<div class="card-wrap">
+<div class="form-card">
 
-    <div class="card-header-row">
-        <h2 class="card-title">Daftar Gejala & Bobot DS</h2>
+    <div class="card-top">
+        <div>
+            <h2 class="card-title">
+                <i class="fas fa-list-check"></i>
+                Daftar Gejala & Bobot DS
+            </h2>
+            <div class="card-subtitle">
+                <i class="fas fa-info-circle"></i>
+                Data relasi gejala untuk penyakit terpilih (beserta bobot DS).
+            </div>
+        </div>
 
         <a href="{{ route('basis_pengetahuan_ds.index') }}" class="btn btn-cancel">
             <i class="fas fa-arrow-left"></i>
@@ -22,29 +31,30 @@
         </a>
     </div>
 
-    <div style="overflow-x:auto;">
-        <table class="table-clean">
+    <div class="table-wrap">
+        <table class="table">
             <thead>
                 <tr>
-                    <th style="width:60px;text-align:center;">#</th>
-                    <th style="width:140px;text-align:center;">Kode Gejala</th>
-                    <th style="text-align:left;">Nama Gejala</th>
-                    <th style="width:120px;text-align:center;">Bobot DS</th>
-                    <th style="width:180px;text-align:center;">Aksi</th>
+                    <th style="width:60px; text-align:center;">#</th>
+                    <th style="width:140px; text-align:center;">Kode Gejala</th>
+                    <th>Nama Gejala</th>
+                    <th style="width:120px; text-align:center;">Bobot DS</th>
+                    <th style="width:200px; text-align:center;">Aksi</th>
                 </tr>
             </thead>
-
             <tbody>
             @forelse($rules as $i => $row)
                 <tr>
-                    <td style="text-align:center;">{{ $i + 1 }}</td>
-                    <td style="text-align:center;font-weight:600;">{{ $row->gejala->kode_gejala }}</td>
+                    <td style="text-align:center;">{{ $i+1 }}</td>
+                    <td style="text-align:center;">{{ $row->gejala->kode_gejala }}</td>
                     <td>{{ $row->gejala->nama_gejala }}</td>
-                    <td style="text-align:center;">{{ number_format((float)$row->ds_value, 2) }}</td>
-                    <td>
-                        <div class="actions">
-                            <a href="{{ route('basis_pengetahuan_ds.edit', $row->id) }}" class="pill pill-edit">
-                                Edit
+                    <td style="text-align:center;">
+                        <span class="badge">{{ number_format((float)$row->ds_value, 2) }}</span>
+                    </td>
+                    <td style="text-align:center;">
+                        <div class="action-group">
+                            <a href="{{ route('basis_pengetahuan_ds.edit', $row->id) }}" class="btn-mini btn-edit">
+                                <i class="fas fa-pen"></i> Edit
                             </a>
 
                             <form action="{{ route('basis_pengetahuan_ds.destroy', $row->id) }}"
@@ -53,7 +63,9 @@
                                   style="margin:0;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="pill pill-delete">Hapus</button>
+                                <button type="submit" class="btn-mini btn-delete">
+                                    <i class="fas fa-trash"></i> Hapus
+                                </button>
                             </form>
                         </div>
                     </td>
@@ -72,135 +84,183 @@
 </div>
 
 <style>
-    .card-wrap{
+    .form-card{
         background:#ffffff;
-        border-radius:20px;
-        box-shadow:0 10px 30px rgba(0,0,0,0.08);
-        padding:25px 30px 30px;
+        border-radius:16px;
+        padding:40px;
+        box-shadow:0 4px 20px rgba(0,0,0,0.08);
         border:1px solid #fde68a;
+        max-width:1800px;
     }
 
-    .card-header-row{
+    .card-top{
         display:flex;
         justify-content:space-between;
-        align-items:center;
+        align-items:flex-start;
+        gap:16px;
         margin-bottom:18px;
-        gap:12px;
+        padding-bottom:18px;
+        border-bottom:1px solid #fde68a;
     }
 
     .card-title{
-        font-size:18px;
-        font-weight:800;
-        color:#5a4a2a;
         margin:0;
+        font-size:18px;
+        font-weight:700;
+        color:#111827;
+        display:flex;
+        align-items:center;
+        gap:10px;
     }
 
-    .table-clean{
+    .card-title i{ color:#111827; }
+
+    .card-subtitle{
+        margin-top:8px;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        font-size:13px;
+        color:#111827;
+        opacity:.8;
+    }
+
+    .card-subtitle i{ font-size:12px; }
+
+    .table-wrap{
+        overflow-x:auto;
+        border-radius:12px;
+        border:1px solid #fde68a;
+        background:#ffffff;
+    }
+
+    .table{
         width:100%;
         border-collapse:collapse;
         font-size:14px;
-        background:#ffffff;
-        border-radius:12px;
-        overflow:hidden;
+        background:white;
     }
 
-    .table-clean thead tr{
-        background:#fff4bf;
-    }
-
-    .table-clean th,
-    .table-clean td{
-        padding:12px 10px;
-        vertical-align:middle;
-        border-bottom:1px solid #f1e4b5;
-    }
-
-    .table-clean tbody tr:nth-child(odd){
-        background:#fffef5;
-    }
-
-    .table-clean tbody tr:nth-child(even){
-        background:#fffbe2;
-    }
-
-    .table-clean tbody tr:hover{
+    .table thead{
         background:#fff9c4;
     }
 
-    .actions{
+    .table th,
+    .table td{
+        padding:12px 12px;
+        text-align:left;
+        vertical-align:top;
+        border-bottom:1px solid #fde68a;
+        color:#111827;
+    }
+
+    .table tbody tr:nth-child(even){ background:#fffef5; }
+    .table tbody tr:hover{ background:#fff9c4; }
+
+    .badge{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        min-width:54px;
+        padding:6px 10px;
+        border-radius:999px;
+        background:#fffbeb;
+        border:1px solid #fde68a;
+        font-weight:700;
+        color:#111827;
+        font-size:13px;
+    }
+
+    .action-group{
         display:flex;
-        gap:8px;
+        gap:10px;
         justify-content:center;
         align-items:center;
         flex-wrap:wrap;
     }
 
-    .pill{
-        padding:6px 14px;
+    .btn-mini{
+        border:none;
         border-radius:999px;
+        padding:7px 12px;
         font-size:13px;
         font-weight:700;
-        text-decoration:none;
-        border:none;
         cursor:pointer;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        line-height:1.2;
-        white-space:nowrap;
-    }
-
-    .pill-edit{
-        background:#f59e0b;
-        color:#fff;
-    }
-    .pill-edit:hover{ background:#d97706; }
-
-    .pill-delete{
-        background:#ffcccc;
-        color:#b91c1c;
-    }
-    .pill-delete:hover{ background:#fca5a5; }
-
-    /* Button back style (samain gaya create/edit) */
-    .btn{
-        padding:10px 18px;
-        border-radius:10px;
-        font-size:14px;
-        font-weight:600;
         text-decoration:none;
         display:inline-flex;
         align-items:center;
         gap:8px;
         transition:all .2s ease;
-        border:none;
-        cursor:pointer;
         white-space:nowrap;
+
+        appearance:none;
+        -webkit-appearance:none;
     }
 
-    .btn-cancel{
-        background:#f3f4f6;
-        color:#5a4a2a;
-        border:2px solid #e5e7eb;
+    .btn-edit{
+        background:#f59e0b;
+        color:#ffffff;
+        box-shadow:0 4px 12px rgba(245,158,11,.25);
+    }
+    .btn-edit:hover{
+        background:#d97706;
+        transform:translateY(-1px);
     }
 
-    .btn-cancel:hover{
-        background:#e5e7eb;
+    .btn-delete{
+        background:#fef2f2;
+        color:#111827;
+        border:1px solid #fecaca;
+    }
+    .btn-delete:hover{
+        background:#fee2e2;
         transform:translateY(-1px);
     }
 
     .empty{
         text-align:center;
-        padding:20px;
-        color:#6b7280;
-        background:#fffef5;
+        padding:22px;
+        color:#111827;
+        font-weight:600;
+        background:#fffbeb;
+    }
+
+    .btn{
+        padding:13px 28px;
+        border:none;
+        border-radius:10px;
+        font-size:15px;
+        font-weight:600;
+        cursor:pointer;
+        text-decoration:none;
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        transition:all .2s ease;
+    }
+
+    .btn-cancel{
+        background:#f3f4f6;
+        color:#111827;
+    }
+    .btn-cancel:hover{
+        background:#e5e7eb;
+        transform:translateY(-2px);
+    }
+
+    .page-title{
+        color:#111827;
+    }
+
+    .page-subtitle{
+        color:#374151;
     }
 
     @media (max-width:768px){
-        .card-wrap{ padding:18px; }
-        .card-header-row{ flex-direction:column; align-items:stretch; }
+        .form-card{ padding:24px; }
+        .card-top{ flex-direction:column; align-items:stretch; }
         .btn{ width:100%; justify-content:center; }
-        .actions{ justify-content:flex-start; }
+        .action-group{ justify-content:flex-start; }
     }
 </style>
 

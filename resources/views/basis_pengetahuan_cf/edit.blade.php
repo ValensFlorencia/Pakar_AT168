@@ -152,7 +152,7 @@
     .alert-error {
         background: #fef2f2;
         border: 1px solid #fecaca;
-        color: #991b1b;
+        color: #991b1b; /* tetap merah (error) */
     }
     .alert-icon { font-size: 20px; margin-top: 2px; }
     .alert-content { flex: 1; }
@@ -169,7 +169,7 @@
         gap: 8px;
         font-weight: 600;
         font-size: 15px;
-        color: #5a4a2a;
+        color: #111827; /* hitam */
         margin-bottom: 10px;
     }
     .form-label i { color: #f59e0b; font-size: 16px; }
@@ -188,7 +188,7 @@
         background: #fffbeb;
         border-radius: 10px;
         font-size: 14px;
-        color: #5a4a2a;
+        color: #111827; /* hitam */
         transition: all 0.2s ease;
         font-family: inherit;
         outline: none;
@@ -203,7 +203,7 @@
         background: #fef3c7;
         font-weight: 600;
         cursor: not-allowed;
-        color: #78350f;
+        color: #111827; /* hitam */
     }
 
     .input-hint {
@@ -211,9 +211,9 @@
         align-items: center;
         gap: 6px;
         font-size: 13px;
-        color: #92400e;
+        color: #111827; /* hitam */
         margin-top: 8px;
-        opacity: 0.8;
+        opacity: 0.7;
     }
     .input-hint i { font-size: 12px; }
 
@@ -232,7 +232,7 @@
         gap: 10px;
         font-size: 16px;
         font-weight: 800;
-        color: #5a4a2a;
+        color: #111827; /* hitam */
         margin-bottom: 16px;
     }
     .section-label i { color: #f59e0b; }
@@ -273,8 +273,8 @@
     .btn i { font-size: 14px; }
 
     .btn-submit {
-        background: #f59e0b; /* solid */
-        color: #ffffff;
+        background: #f59e0b;
+        color: #ffffff; /* tetap putih */
         box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
     .btn-submit:hover {
@@ -285,11 +285,18 @@
 
     .btn-cancel {
         background: #f3f4f6;
-        color: #5a4a2a;
+        color: #111827; /* hitam */
     }
     .btn-cancel:hover {
         background: #e5e7eb;
         transform: translateY(-2px);
+    }
+    .page-title{
+    color:#111827;   /* hitam elegan */
+    }
+
+    .page-subtitle{
+        color:#374151;   /* abu gelap */
     }
 
     @media (max-width: 768px) {
@@ -297,6 +304,7 @@
         .form-actions { flex-direction: column; }
         .btn { width: 100%; justify-content: center; }
     }
+
 </style>
 
 @endsection

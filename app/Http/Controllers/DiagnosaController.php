@@ -27,22 +27,24 @@ class DiagnosaController extends Controller
         $request->validate([
             'gejala_id'   => 'required|array|min:1',
             'gejala_id.*' => 'exists:gejala,id',
-            'cf_user'     => 'required|array',
-            'cf_user.*'   => 'required|numeric|min:0|max:1',
+            'cf_user'     => 'required|array', // associative
         ]);
 
-        $selected = [];
-        foreach ($request->gejala_id as $i => $gid) {
-            $cfUser = $request->cf_user[$i] ?? null;
+        $gejalaIds = $request->input('gejala_id', []);
+        $cfUserMap = $request->input('cf_user', []);
 
-            // kalau user belum pilih bobot, skip
-            if ($cfUser === null || $cfUser === '') {
-                continue;
-            }
+        $selected = [];
+        foreach ($gejalaIds as $gid) {
+            $cfUser = $cfUserMap[$gid] ?? null;
+
+            if ($cfUser === null || $cfUser === '') continue;
+
+            $cfUser = (float) $cfUser;
+            if ($cfUser < 0 || $cfUser > 1) continue;
 
             $selected[] = [
                 'gejala_id' => (int) $gid,
-                'cf_user'   => (float) $cfUser,
+                'cf_user'   => $cfUser,
             ];
         }
 
@@ -53,14 +55,13 @@ class DiagnosaController extends Controller
         }
 
         // ------ 2. Data gejala terpilih (untuk view + payload riwayat) ------
-        $gejalaIds = collect($selected)->pluck('gejala_id')->all();
+        $gejalaIdsSelected = collect($selected)->pluck('gejala_id')->all();
 
-        $gejalaModels = Gejala::whereIn('id', $gejalaIds)
+        $gejalaModels = Gejala::whereIn('id', $gejalaIdsSelected)
             ->orderBy('kode_gejala')
             ->get()
             ->keyBy('id');
 
-        // bentuk data rapi untuk ditampilkan & disimpan
         $gejalaTerpilih = array_map(function ($item) use ($gejalaModels) {
             $g = $gejalaModels[$item['gejala_id']] ?? null;
 
@@ -76,12 +77,10 @@ class DiagnosaController extends Controller
         $hasilCF = $this->hitungCF($selected);
         $hasilDS = $this->hitungDS($selected);
 
-        // urutkan dari terbesar
         $sortedCF = collect($hasilCF)->sortByDesc('nilai')->values()->all();
         $sortedDS = collect($hasilDS)->sortByDesc('nilai')->values()->all();
 
-        // ------ 4. Ranking + hasil teratas + kesimpulan ------
-        // (biar sederhana: pakai DS jika ada, kalau DS kosong pakai CF)
+        // ------ 4. Ranking + kesimpulan ------
         $hasilTeratas = $sortedDS[0] ?? ($sortedCF[0] ?? null);
 
         $rankingPenyakit = [
@@ -96,12 +95,12 @@ class DiagnosaController extends Controller
 
         // ------ 5. SIMPAN RIWAYAT ------
         RiwayatDiagnosa::create([
-            'user_id' => auth()->id(), // boleh null
+            'user_id' => auth()->id(),
             'judul'   => 'Hasil Diagnosa - ' . ($hasilTeratas['nama'] ?? 'Tidak diketahui'),
             'payload' => [
                 'gejala_terpilih' => $gejalaTerpilih,
-                'hasil_cf'        => $sortedCF,   // simpan yang sudah urut
-                'hasil_ds'        => $sortedDS,   // simpan yang sudah urut
+                'hasil_cf'        => $sortedCF,
+                'hasil_ds'        => $sortedDS,
                 'ranking'         => $rankingPenyakit,
                 'kesimpulan'      => $kesimpulan,
             ],
@@ -124,8 +123,10 @@ class DiagnosaController extends Controller
      */
     private function hitungCF(array $selected): array
     {
-        // ambil semua basis CF yang berkaitan dengan gejala yang dipilih
-        $gejalaIds = collect($selected)->pluck('gejala_id')->all();
+        // bikin map: gejala_id => cf_user (sekali saja)
+        $cfUserByGejala = collect($selected)->pluck('cf_user', 'gejala_id'); // [gid => cf_user]
+
+        $gejalaIds = $cfUserByGejala->keys()->all();
 
         $basis = BasisPengetahuanCF::with('penyakit')
             ->whereIn('gejala_id', $gejalaIds)
@@ -138,33 +139,31 @@ class DiagnosaController extends Controller
             $cfOld = null;
 
             foreach ($rules as $row) {
-                // CF_pakar diambil dari basis_pengetahuan_cf (kolom cf_value)
-                $cfPakar = $row->cf_value;
+                $cfPakar = (float) $row->cf_value;
 
-                // CF_user dari input pasien (dropdown “Yakin, Cukup Yakin, ...”)
-                $cfUser = collect($selected)
-                    ->firstWhere('gejala_id', $row->gejala_id)['cf_user'] ?? null;
+                // ambil cf user langsung dari map
+                $cfUser = $cfUserByGejala->get($row->gejala_id);
 
-                if ($cfUser === null) {
-                    continue;
-                }
+                if ($cfUser === null) continue;
 
-                // ====== CF(H,E) = CF_user * CF_pakar (Tabel 3.8–3.14) ======
+                $cfUser = (float) $cfUser;
+
+                // CF(H,E) = CF_user * CF_pakar
                 $cfHE = $cfUser * $cfPakar;
 
-                // ====== Kombinasi: CFcombine = CFold + CFnew * (1 - CFold) ======
-                if ($cfOld === null) {
-                    $cfOld = $cfHE;        // gejala pertama
-                } else {
-                    $cfOld = $cfOld + $cfHE * (1 - $cfOld);
-                }
+                // combine
+                $cfOld = ($cfOld === null)
+                    ? $cfHE
+                    : ($cfOld + $cfHE * (1 - $cfOld));
             }
 
             if ($cfOld !== null) {
+                $p = $rules->first()->penyakit;
+
                 $hasil[] = [
                     'penyakit_id' => $penyakitId,
-                    'kode'        => $rules->first()->penyakit->kode_penyakit,
-                    'nama'        => $rules->first()->penyakit->nama_penyakit,
+                    'kode'        => $p->kode_penyakit,
+                    'nama'        => $p->nama_penyakit,
                     'nilai'       => $cfOld,
                     'persen'      => round($cfOld * 100, 2),
                 ];
@@ -173,6 +172,7 @@ class DiagnosaController extends Controller
 
         return $hasil;
     }
+
 
     /* ============================================================
      *  IMPLEMENTASI DEMPSTER-SHAFER (tabel 3.19–3.21)

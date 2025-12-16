@@ -147,7 +147,7 @@
         gap: 8px;
         font-weight: 600;
         font-size: 15px;
-        color: #5a4a2a;
+        color: #000;
         margin-bottom: 10px;
     }
 
@@ -170,7 +170,7 @@
         background: #fffbeb;
         border-radius: 10px;
         font-size: 14px;
-        color: #5a4a2a;
+        color: #000;
         transition: all 0.2s ease;
         font-family: inherit;
     }
@@ -205,7 +205,7 @@
         align-items: center;
         gap: 6px;
         font-size: 13px;
-        color: #92400e;
+        color: #000;
         margin-top: 8px;
         opacity: 0.8;
     }
@@ -259,13 +259,21 @@
 
     .btn-cancel {
         background: #f3f4f6;
-        color: #5a4a2a;
+        color: #000;
     }
 
     .btn-cancel:hover {
         background: #e5e7eb;
         transform: translateY(-2px);
     }
+    .page-title{
+    color:#000000; /* hitam */
+    }
+
+    .page-subtitle{
+    color:#374151; /* hitam keabu (lebih enak dibaca) */
+    }
+
 
     @media (max-width: 768px) {
         .form-card {

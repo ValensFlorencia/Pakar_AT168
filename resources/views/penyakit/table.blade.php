@@ -20,7 +20,7 @@
                 margin:0;
                 font-size:18px;
                 font-weight:800;
-                color:#5a4a2a;
+                color:#000;
                 display:flex;
                 align-items:center;
                 gap:10px;
@@ -35,7 +35,7 @@
                 align-items:center;
                 gap:8px;
                 font-size:13px;
-                color:#92400e;
+                color:#000;
                 opacity:.85;
             ">
                 <i class="fas fa-info-circle" style="font-size:12px;"></i>
@@ -161,7 +161,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="6" style="padding:22px;text-align:center;color:#8b7355;font-weight:600;background:#fffbeb;">
+                    <td colspan="6" style="padding:22px;text-align:center;color:#000;font-weight:600;background:#fffbeb;">
                         Belum ada data penyakit.
                     </td>
                 </tr>

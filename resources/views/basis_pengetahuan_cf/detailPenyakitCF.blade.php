@@ -106,14 +106,14 @@
     .card-title{
         margin:0;
         font-size:18px;
-        font-weight:800;
-        color:#5a4a2a;
+        font-weight:700;
+        color:#111827; /* hitam */
         display:flex;
         align-items:center;
         gap:10px;
     }
 
-    .card-title i{ color:#f59e0b; }
+    .card-title i{ color:#111827; } /* icon ikut hitam */
 
     .card-subtitle{
         margin-top:8px;
@@ -121,8 +121,8 @@
         align-items:center;
         gap:8px;
         font-size:13px;
-        color:#92400e;
-        opacity:.85;
+        color:#111827; /* hitam */
+        opacity:.8;
     }
 
     .card-subtitle i{ font-size:12px; }
@@ -145,11 +145,13 @@
         background:#fff9c4;
     }
 
-    .table th, .table td{
+    .table th,
+    .table td{
         padding:12px 12px;
         text-align:left;
         vertical-align:top;
         border-bottom:1px solid #fde68a;
+        color:#111827; /* hitam */
     }
 
     .table tbody tr:nth-child(even){ background:#fffef5; }
@@ -165,7 +167,7 @@
         background:#fffbeb;
         border:1px solid #fde68a;
         font-weight:700;
-        color:#78350f;
+        color:#111827; /* hitam */
         font-size:13px;
     }
 
@@ -194,7 +196,7 @@
 
     .btn-edit{
         background:#f59e0b;
-        color:#fff;
+        color:#ffffff; /* tetap putih */
         box-shadow:0 4px 12px rgba(245,158,11,.25);
     }
     .btn-edit:hover{
@@ -204,7 +206,7 @@
 
     .btn-delete{
         background:#fef2f2;
-        color:#b91c1c;
+        color:#111827; /* hitam */
         border:1px solid #fecaca;
     }
     .btn-delete:hover{
@@ -215,12 +217,12 @@
     .empty{
         text-align:center;
         padding:22px;
-        color:#8b7355;
+        color:#111827; /* hitam */
         font-weight:600;
         background:#fffbeb;
     }
 
-    /* tombol kembali (samain dengan halaman lain) */
+    /* tombol kembali */
     .btn{
         padding:13px 28px;
         border:none;
@@ -234,13 +236,21 @@
         gap:8px;
         transition:all .2s ease;
     }
+
     .btn-cancel{
         background:#f3f4f6;
-        color:#5a4a2a;
+        color:#111827; /* hitam */
     }
     .btn-cancel:hover{
         background:#e5e7eb;
         transform:translateY(-2px);
+    }
+    .page-title{
+    color:#111827;   /* hitam elegan */
+    }
+
+    .page-subtitle{
+        color:#374151;   /* abu gelap */
     }
 
     @media (max-width:768px){
@@ -249,6 +259,7 @@
         .btn{ width:100%; justify-content:center; }
         .action-group{ justify-content:flex-start; }
     }
+
 </style>
 
 @endsection

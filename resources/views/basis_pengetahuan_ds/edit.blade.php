@@ -114,172 +114,187 @@
 </div>
 
 <style>
-    .form-card{
-        background:#ffffff;
-        border-radius:16px;
-        padding:40px;
-        box-shadow:0 4px 20px rgba(0,0,0,0.08);
-        border:1px solid #fde68a;
-        max-width:1800px;
+    .form-card {
+        background: #ffffff;
+        border-radius: 16px;
+        padding: 40px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 1px solid #fde68a;
+        max-width: 1800px;
     }
 
-    /* Alert */
-    .alert{
-        padding:16px 20px;
-        border-radius:12px;
-        margin-bottom:30px;
-        display:flex;
-        gap:14px;
-        align-items:flex-start;
+    /* Alert Styling */
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
     }
-    .alert-error{
-        background:#fef2f2;
-        border:1px solid #fecaca;
-        color:#991b1b;
+    .alert-error {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        color: #991b1b; /* tetap merah (error) */
     }
-    .alert-icon{ font-size:20px; margin-top:2px; }
-    .alert-content{ flex:1; }
-    .alert-content strong{ display:block; margin-bottom:8px; font-weight:600; }
-    .alert-content ul{ margin:0; padding-left:20px; }
-    .alert-content li{ margin-bottom:4px; font-size:14px; }
+    .alert-icon { font-size: 20px; margin-top: 2px; }
+    .alert-content { flex: 1; }
+    .alert-content strong { display: block; margin-bottom: 8px; font-weight: 600; }
+    .alert-content ul { margin: 0; padding-left: 20px; }
+    .alert-content li { margin-bottom: 4px; font-size: 14px; }
 
-    /* Form */
-    .form-group{ margin-bottom:28px; }
+    /* Form Group */
+    .form-group { margin-bottom: 28px; }
 
-    .form-label{
-        display:flex;
-        align-items:center;
-        gap:8px;
-        font-weight:600;
-        font-size:15px;
-        color:#5a4a2a;
-        margin-bottom:10px;
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        font-size: 15px;
+        color: #111827; /* hitam */
+        margin-bottom: 10px;
     }
-    .form-label i{ color:#f59e0b; font-size:16px; }
+    .form-label i { color: #f59e0b; font-size: 16px; }
 
-    .form-input{
-        width:100%;
-        padding:14px 16px;
-        border:2px solid #fde68a;
-        background:#fffbeb;
-        border-radius:10px;
-        font-size:14px;
-        color:#5a4a2a;
-        transition:all .2s ease;
-        font-family:inherit;
-        outline:none;
+    /* Input */
+    .form-input {
+        width: 100%;
+        padding: 14px 16px;
+        border: 2px solid #fde68a;
+        background: #fffbeb;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #111827; /* hitam */
+        transition: all 0.2s ease;
+        font-family: inherit;
+        outline: none;
     }
-    .form-input:focus{
-        border-color:#f59e0b;
-        background:#ffffff;
-        box-shadow:0 0 0 3px rgba(245,158,11,0.1);
-    }
-
-    .input-readonly{
-        background:#fef3c7;
-        font-weight:600;
-        cursor:not-allowed;
-        color:#78350f;
+    .form-input:focus {
+        border-color: #f59e0b;
+        background: #ffffff;
+        box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
     }
 
-    .input-hint{
-        display:flex;
-        align-items:center;
-        gap:6px;
-        font-size:13px;
-        color:#92400e;
-        margin-top:8px;
-        opacity:.85;
+    .input-readonly {
+        background: #fef3c7;
+        font-weight: 600;
+        cursor: not-allowed;
+        color: #111827; /* hitam */
     }
-    .input-hint i{ font-size:12px; }
+
+    .input-hint {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 13px;
+        color: #111827; /* hitam */
+        margin-top: 8px;
+        opacity: 0.7;
+    }
+    .input-hint i { font-size: 12px; }
 
     /* Section */
-    .gejala-section{
-        background:#ffffff;
-        border:1px solid #fde68a;
-        border-radius:14px;
-        padding:22px;
-        margin-top:10px;
+    .gejala-section {
+        background: #ffffff;
+        border: 1px solid #fde68a;
+        border-radius: 14px;
+        padding: 22px;
+        margin-top: 10px;
     }
-    .section-label{
-        display:flex;
-        align-items:center;
-        gap:10px;
-        font-size:16px;
-        font-weight:800;
-        color:#5a4a2a;
-        margin-bottom:16px;
-    }
-    .section-label i{ color:#f59e0b; }
 
+    .section-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 800;
+        color: #111827; /* hitam */
+        margin-bottom: 16px;
+    }
+    .section-label i { color: #f59e0b; }
+
+    /* ✅ Samain dengan CF: layout row-wrap/col look */
     .gejala-row{
         display:flex;
-        gap:12px;
-        align-items:center;
-        background:#fffbeb;
-        padding:14px;
-        border-radius:12px;
-        border:2px solid #fde68a;
+        gap:18px;
+        align-items:flex-start;
         flex-wrap:wrap;
-    }
-    .gejala-row:hover{
-        border-color:#f59e0b;
-        box-shadow:0 4px 12px rgba(245,158,11,0.12);
-        background:#ffffff;
+        background: transparent;  /* beda dari sebelumnya */
+        padding: 0;               /* samain CF */
+        border: 0;                /* samain CF */
+        border-radius: 0;
+        box-shadow: none;
     }
 
-    .gejala-select{ flex:2; min-width:280px; }
-    .ds-select{ flex:1; min-width:180px; }
+    .gejala-select{
+        flex: 1;
+        min-width: 280px;
+    }
+
+    .ds-select{
+        flex: 1;
+        min-width: 280px;
+    }
 
     /* Actions */
-    .form-actions{
-        display:flex;
-        gap:12px;
-        margin-top:35px;
-        padding-top:30px;
-        border-top:1px solid #fde68a;
-    }
-    .btn{
-        padding:13px 28px;
-        border:none;
-        border-radius:10px;
-        font-size:15px;
-        font-weight:600;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        transition:all .2s ease;
-    }
-    .btn i{ font-size:14px; }
-
-    .btn-submit{
-        background:#f59e0b; /* solid */
-        color:#ffffff;
-        box-shadow:0 4px 12px rgba(245,158,11,0.3);
-    }
-    .btn-submit:hover{
-        background:#d97706;
-        transform:translateY(-2px);
-        box-shadow:0 6px 16px rgba(245,158,11,0.4);
+    .form-actions {
+        display: flex;
+        gap: 12px;
+        margin-top: 35px;
+        padding-top: 30px;
+        border-top: 1px solid #fde68a;
     }
 
-    .btn-cancel{
-        background:#f3f4f6;
-        color:#5a4a2a;
+    .btn {
+        padding: 13px 28px;
+        border: none;
+        border-radius: 10px;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.2s ease;
     }
-    .btn-cancel:hover{
-        background:#e5e7eb;
-        transform:translateY(-2px);
+    .btn i { font-size: 14px; }
+
+    .btn-submit {
+        background: #f59e0b;
+        color: #ffffff; /* tetap putih */
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+    .btn-submit:hover {
+        background: #d97706;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
     }
 
-    @media (max-width:768px){
-        .form-card{ padding:24px; }
+    .btn-cancel {
+        background: #f3f4f6;
+        color: #111827; /* hitam */
+    }
+    .btn-cancel:hover {
+        background: #e5e7eb;
+        transform: translateY(-2px);
+    }
+
+    .page-title{
+        color:#111827;
+    }
+
+    .page-subtitle{
+        color:#374151;
+    }
+
+    @media (max-width: 768px) {
+        .form-card { padding: 24px; }
         .gejala-row{ flex-direction:column; align-items:stretch; }
         .gejala-select, .ds-select{ min-width:unset; width:100%; }
-        .form-actions{ flex-direction:column; }
-        .btn{ width:100%; justify-content:center; }
+        .form-actions { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
     }
 </style>
 

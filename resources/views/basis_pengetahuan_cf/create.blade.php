@@ -150,7 +150,7 @@
         gap: 8px;
         font-weight: 600;
         font-size: 15px;
-        color: #5a4a2a;
+        color:#000;
         margin-bottom: 10px;
     }
 
@@ -162,14 +162,15 @@
         margin-left: 2px;
     }
 
+    /* ✅ Input dibuat polos (tanpa background kuning) */
     .form-input {
         width: 100%;
         padding: 14px 16px;
         border: 2px solid #fde68a;
-        background: #fffbeb;
+        background: #ffffff;           /* <--- ubah dari #fffbeb ke putih */
         border-radius: 10px;
         font-size: 14px;
-        color: #5a4a2a;
+        color:#000;
         transition: all 0.2s ease;
         font-family: inherit;
         outline: none;
@@ -186,7 +187,7 @@
         align-items: center;
         gap: 6px;
         font-size: 13px;
-        color: #92400e;
+        color:#000;
         margin-top: 8px;
         opacity: 0.8;
     }
@@ -208,7 +209,7 @@
         gap: 10px;
         font-size: 16px;
         font-weight: 700;
-        color: #5a4a2a;
+        color: #000;
         margin-bottom: 16px;
     }
 
@@ -220,27 +221,21 @@
         gap: 12px;
     }
 
+    /* ✅ ROW gejala: hilangkan background, pakai border aja */
     .gejala-row {
         display: flex;
         gap: 12px;
         align-items: center;
-        background: #fffbeb;
+        background: transparent;       /* <--- ini kunci */
         padding: 14px;
         border-radius: 12px;
-        border: 2px solid #fde68a;
-    }
-
-    .gejala-row:hover {
-        border-color: #f59e0b;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
-        background: #ffffff;
     }
 
     .gejala-select { flex: 2; }
     .cf-select { flex: 1; }
 
     .btn-delete {
-        background: #fef2f2;
+        background: #ffffff;
         border: 2px solid #fecaca;
         border-radius: 10px;
         padding: 10px 14px;
@@ -255,7 +250,7 @@
     }
 
     .btn-delete:hover {
-        background: #fee2e2;
+        background: #fef2f2;
         border-color: #fca5a5;
         transform: translateY(-1px);
     }
@@ -267,8 +262,8 @@
         margin-top: 14px;
         padding: 12px 18px;
         border-radius: 10px;
-        background: #fff7ed;
-        color: #9a3412;
+        background: #ffffff;
+        color: #000;
         border: 2px solid #fed7aa;
         font-weight: 700;
         cursor: pointer;
@@ -276,7 +271,7 @@
     }
 
     .btn-add:hover {
-        background: #ffedd5;
+        background: #fff7ed;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(234, 88, 12, 0.18);
     }
@@ -320,12 +315,20 @@
 
     .btn-cancel {
         background: #f3f4f6;
-        color: #5a4a2a;
+        color: #000;
     }
 
     .btn-cancel:hover {
         background: #e5e7eb;
         transform: translateY(-2px);
+    }
+
+    .page-title{
+        color:#111827;
+    }
+
+    .page-subtitle{
+        color:#374151;
     }
 
     @media (max-width: 768px) {

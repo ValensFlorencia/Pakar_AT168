@@ -131,8 +131,8 @@
     .card-title{
         margin:0;
         font-size:18px;
-        font-weight:800;
-        color:#5a4a2a;
+        font-weight:700;
+        color:#000;
         display:flex;
         align-items:center;
         gap:10px;
@@ -146,7 +146,7 @@
         align-items:center;
         gap:8px;
         font-size:13px;
-        color:#92400e;
+        color:#000;
         opacity:.85;
     }
 
@@ -192,7 +192,7 @@
     .empty{
         text-align:center;
         padding:22px;
-        color:#8b7355;
+        color:#000;
         font-weight:600;
         background:#fffbeb;
     }
@@ -259,6 +259,13 @@
     .btn-delete:hover{
         background:#fee2e2;
         transform:translateY(-1px);
+    }
+    .page-title{
+    color:#111827;   /* hitam elegan */
+    }
+
+    .page-subtitle{
+        color:#374151;   /* abu gelap */
     }
 
     @media (max-width:768px){

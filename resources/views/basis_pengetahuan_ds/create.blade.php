@@ -149,7 +149,7 @@
         gap: 8px;
         font-weight: 600;
         font-size: 15px;
-        color: #5a4a2a;
+        color:#000;
         margin-bottom: 10px;
     }
 
@@ -161,14 +161,15 @@
         margin-left: 2px;
     }
 
+    /* ✅ Samain CF: input polos putih */
     .form-input {
         width: 100%;
         padding: 14px 16px;
         border: 2px solid #fde68a;
-        background: #fffbeb;
+        background: #ffffff;  /* putih */
         border-radius: 10px;
         font-size: 14px;
-        color: #5a4a2a;
+        color:#000;
         transition: all 0.2s ease;
         font-family: inherit;
         outline: none;
@@ -185,7 +186,7 @@
         align-items: center;
         gap: 6px;
         font-size: 13px;
-        color: #92400e;
+        color:#000;
         margin-top: 8px;
         opacity: 0.8;
     }
@@ -207,7 +208,7 @@
         gap: 10px;
         font-size: 16px;
         font-weight: 700;
-        color: #5a4a2a;
+        color: #000;
         margin-bottom: 16px;
     }
 
@@ -219,27 +220,22 @@
         gap: 12px;
     }
 
+    /* ✅ Samain CF: row gejala tanpa background */
     .gejala-row {
         display: flex;
         gap: 12px;
         align-items: center;
-        background: #fffbeb;
+        background: transparent;
         padding: 14px;
         border-radius: 12px;
-        border: 2px solid #fde68a;
-    }
-
-    .gejala-row:hover {
-        border-color: #f59e0b;
-        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
-        background: #ffffff;
     }
 
     .gejala-select { flex: 2; }
     .ds-select { flex: 1; }
 
+    /* ✅ Samain CF: delete putih */
     .btn-delete {
-        background: #fef2f2;
+        background: #ffffff;
         border: 2px solid #fecaca;
         border-radius: 10px;
         padding: 10px 14px;
@@ -254,33 +250,38 @@
     }
 
     .btn-delete:hover {
-        background: #fee2e2;
+        background: #fef2f2;
         border-color: #fca5a5;
         transform: translateY(-1px);
     }
 
+    /* ✅ Samain CF: tombol add putih */
     .btn-add {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 14px;
-        padding: 12px 18px;
-        border-radius: 10px;
-        background: #fff7ed;
-        color: #9a3412;
-        border: 2px solid #fed7aa;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 12px 18px;
+    border-radius: 10px;
+
+    background: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+
+    color: #000;
+    border: 2px solid #fed7aa;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
     }
 
     .btn-add:hover {
-        background: #ffedd5;
+        background: #fff7ed;
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(234, 88, 12, 0.18);
     }
 
-    /* Actions (samain create/edit) */
+    /* Actions */
     .form-actions {
         display: flex;
         gap: 12px;
@@ -306,7 +307,7 @@
     .btn i { font-size: 14px; }
 
     .btn-submit {
-        background: #f59e0b; /* solid */
+        background: #f59e0b;
         color: #ffffff;
         box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
@@ -319,12 +320,20 @@
 
     .btn-cancel {
         background: #f3f4f6;
-        color: #5a4a2a;
+        color: #000;
     }
 
     .btn-cancel:hover {
         background: #e5e7eb;
         transform: translateY(-2px);
+    }
+
+    .page-title{
+        color:#111827;
+    }
+
+    .page-subtitle{
+        color:#374151;
     }
 
     @media (max-width: 768px) {
@@ -335,6 +344,7 @@
         .btn { width: 100%; justify-content: center; }
     }
 </style>
+
 
 <script>
     // ✅ dari controller DS: $existingMap (penyakit_id => [gejala_id...])

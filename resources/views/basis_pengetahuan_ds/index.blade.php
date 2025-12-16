@@ -74,7 +74,6 @@
     </div>
 
 </div>
-
 <style>
     .form-card{
         background:#ffffff;
@@ -98,8 +97,8 @@
     .card-title{
         margin:0;
         font-size:18px;
-        font-weight:800;
-        color:#5a4a2a;
+        font-weight:700;
+        color:#111827; /* SAMA DENGAN CF */
         display:flex;
         align-items:center;
         gap:10px;
@@ -113,8 +112,8 @@
         align-items:center;
         gap:8px;
         font-size:13px;
-        color:#92400e;
-        opacity:.85;
+        color:#111827; /* hitam */
+        opacity:.75;   /* SAMA DENGAN CF */
     }
 
     .card-subtitle i{ font-size:12px; }
@@ -138,11 +137,13 @@
         background:#fff9c4;
     }
 
-    .table th, .table td{
+    .table th,
+    .table td{
         padding:12px 12px;
         text-align:left;
         vertical-align:top;
         border-bottom:1px solid #fde68a;
+        color:#111827; /* hitam */
     }
 
     .table tbody tr:nth-child(even){ background:#fffef5; }
@@ -158,14 +159,14 @@
         background:#fffbeb;
         border:1px solid #fde68a;
         font-weight:700;
-        color:#78350f;
+        color:#111827; /* hitam */
         font-size:13px;
     }
 
     .empty{
         text-align:center;
         padding:22px;
-        color:#8b7355;
+        color:#111827; /* hitam */
         font-weight:600;
         background:#fffbeb;
     }
@@ -215,12 +216,21 @@
 
     .btn-detail{
         background:#fff9c4;
-        color:#78350f;
+        color:#111827; /* hitam */
     }
 
     .btn-detail:hover{
         background:#fff9c4;
         transform: translateY(-1px);
+    }
+
+    /* Page header */
+    .page-title{
+        color:#111827;
+    }
+
+    .page-subtitle{
+        color:#374151;
     }
 
     @media (max-width:768px){
