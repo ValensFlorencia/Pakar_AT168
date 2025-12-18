@@ -3,164 +3,344 @@
 @section('title', 'Detail Riwayat Diagnosa')
 
 @section('content')
-<div style="max-width:1800px;margin:0 auto;padding:24px;">
-    <h1 style="font-size:28px;font-weight:800;color:#111827;margin-bottom:24px;">Detail Riwayat Diagnosa</h1>
+@php
+    $p = $riwayat->payload ?? [];
+    $gejala = $p['gejala_terpilih'] ?? [];
+    $ranking = $p['ranking'] ?? [];
+    $kesimpulan = $p['kesimpulan'] ?? null;
 
-    @php
-        $p = $riwayat->payload ?? [];
-        $gejala = $p['gejala_terpilih'] ?? [];
-        $ranking = $p['ranking'] ?? [];
-        $kesimpulan = $p['kesimpulan'] ?? null;
-    @endphp
+    $isGrouped = is_array($ranking) && (array_key_exists('cf', $ranking) || array_key_exists('ds', $ranking));
+    $groups = $isGrouped
+        ? [
+            'CF' => $ranking['cf'] ?? [],
+            'DS' => $ranking['ds'] ?? [],
+          ]
+        : [
+            'Hasil' => $ranking,
+          ];
+@endphp
 
-    <div style="background:#fff;border-radius:16px;box-shadow:0 4px 6px rgba(0,0,0,0.05);padding:32px;margin-bottom:24px;">
+<div class="page-head">
+    <div>
+        <h1 class="page-title">Detail Riwayat Diagnosa</h1>
+        <p class="page-subtitle">
+            Riwayat hasil diagnosa yang tersimpan (tanggal, gejala, kesimpulan, dan ranking).
+        </p>
+    </div>
 
-        {{-- Header Section --}}
-        <div style="display:flex;justify-content:space-between;align-items:start;gap:20px;flex-wrap:wrap;padding-bottom:24px;border-bottom:2px solid #f3f4f6;">
-            <div>
-                <div style="font-size:24px;font-weight:800;color:#111827;margin-bottom:8px;">
-                    {{ $riwayat->judul ?? 'Hasil Diagnosa' }}
-                </div>
-                <div style="display:flex;align-items:center;gap:8px;color:#6b7280;font-size:14px;">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                    </svg>
-                    <span><b>{{ ($riwayat->diagnosa_at ?? $riwayat->created_at)->format('d M Y H:i') }}</b> WIB</span>
-                </div>
-            </div>
-
-            <a href="{{ route('riwayat-diagnosa.index') }}"
-               style="display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:10px;background:#111827;color:#fff;text-decoration:none;font-weight:600;font-size:14px;transition:all 0.2s;">
-               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                   <line x1="19" y1="12" x2="5" y2="12"></line>
-                   <polyline points="12 19 5 12 12 5"></polyline>
-               </svg>
-               Kembali
-            </a>
+    <div class="pill-wrap">
+        <div class="pill">
+            <span class="pill-label">Tanggal</span>
+            <span class="pill-value">
+                {{ ($riwayat->diagnosa_at ?? $riwayat->created_at)->format('d M Y H:i') }} WIB
+            </span>
         </div>
 
-        {{-- Kesimpulan --}}
-        <div style="margin-top:24px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                <div style="width:4px;height:24px;background:#10b981;border-radius:2px;"></div>
-                <h2 style="font-size:18px;font-weight:800;color:#111827;margin:0;">Kesimpulan</h2>
-            </div>
-            <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:12px;padding:20px;">
-                <p style="color:#166534;line-height:1.7;margin:0;font-size:15px;">
-                    {{ $kesimpulan ?? 'Tidak ada kesimpulan tersimpan.' }}
-                </p>
-            </div>
-        </div>
-
-        {{-- Gejala Terpilih --}}
-        <div style="margin-top:24px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                <div style="width:4px;height:24px;background:#3b82f6;border-radius:2px;"></div>
-                <h2 style="font-size:18px;font-weight:800;color:#111827;margin:0;">Gejala Terpilih</h2>
-            </div>
-            <div style="background:#eff6ff;border:1px solid #93c5fd;border-radius:12px;padding:20px;">
-                @if(empty($gejala))
-                    <div style="color:#1e40af;">Tidak ada data gejala tersimpan.</div>
-                @else
-                    <ul style="margin:0;padding-left:20px;color:#1e3a8a;">
-                        @foreach($gejala as $g)
-                            <li style="margin-bottom:8px;line-height:1.6;">
-                                <span style="font-weight:600;">
-                                @if(is_array($g))
-                                    {{ $g['kode_gejala'] ?? ($g['kode'] ?? '') }}
-                                </span>
-                                - {{ $g['nama_gejala'] ?? ($g['nama'] ?? ($g['gejala'] ?? '-')) }}
-
-                                @if(isset($g['cf_user']))
-                                    <span style="color:#60a5fa;font-size:14px;">
-                                        (CF user: {{ $g['cf_user'] }})
-                                    </span>
-                                @endif
-                                @else
-                                    {{ $g }}
-                                @endif
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-            </div>
-        </div>
-
-        {{-- Ranking Penyakit --}}
-        <div style="margin-top:24px;">
-            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                <div style="width:4px;height:24px;background:#f59e0b;border-radius:2px;"></div>
-                <h2 style="font-size:18px;font-weight:800;color:#111827;margin:0;">Hasil Diagnosa (Ranking)</h2>
-            </div>
-
-            @php
-                $isGrouped = is_array($ranking) && (array_key_exists('cf', $ranking) || array_key_exists('ds', $ranking));
-                $groups = $isGrouped
-                    ? [
-                        'CF' => $ranking['cf'] ?? [],
-                        'DS' => $ranking['ds'] ?? [],
-                      ]
-                    : [
-                        'Hasil' => $ranking,
-                      ];
-            @endphp
-
-            @if(empty($ranking))
-                <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;padding:20px;">
-                    <div style="color:#92400e;">Tidak ada ranking tersimpan.</div>
-                </div>
-            @else
-                @foreach($groups as $label => $list)
-                    <div style="margin-bottom:20px;">
-                        <div style="background:#fff7ed;padding:12px 16px;border-radius:10px;margin-bottom:12px;">
-                            <span style="font-weight:800;color:#9a3412;font-size:16px;">{{ $label }}</span>
-                        </div>
-
-                        @if(empty($list))
-                            <div style="background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;padding:16px;color:#92400e;">
-                                Data {{ $label }} tidak tersedia.
-                            </div>
-                        @else
-                            <div style="overflow:auto;border:1px solid #fed7aa;border-radius:12px;">
-                                <table style="width:100%;border-collapse:collapse;background:#fff;">
-                                    <thead>
-                                        <tr style="background:#ffedd5;">
-                                            <th style="padding:16px;text-align:left;font-weight:700;color:#9a3412;border-bottom:2px solid #fed7aa;">No</th>
-                                            <th style="padding:16px;text-align:left;font-weight:700;color:#9a3412;border-bottom:2px solid #fed7aa;">Penyakit</th>
-                                            <th style="padding:16px;text-align:left;font-weight:700;color:#9a3412;border-bottom:2px solid #fed7aa;">Nilai</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @foreach($list as $idx => $row)
-                                        @php
-                                            $nama  = $row['nama'] ?? $row['nama_penyakit'] ?? $row['penyakit'] ?? '-';
-                                            $kode  = $row['kode'] ?? $row['kode_penyakit'] ?? null;
-                                            $nilai = $row['nilai'] ?? $row['score'] ?? null;
-                                        @endphp
-                                        <tr style="transition:background 0.2s;" onmouseover="this.style.background='#fffbeb'" onmouseout="this.style.background='#fff'">
-                                            <td style="padding:16px;border-bottom:1px solid #fed7aa;color:#78350f;font-weight:600;">
-                                                {{ $idx + 1 }}
-                                            </td>
-                                            <td style="padding:16px;border-bottom:1px solid #fed7aa;color:#78350f;">
-                                                <div style="font-weight:700;color:#92400e;">{{ $kode ? $kode.' - ' : '' }}{{ $nama }}</div>
-                                            </td>
-                                            <td style="padding:16px;border-bottom:1px solid #fed7aa;color:#78350f;font-weight:700;">
-                                                {{ is_null($nilai) ? '-' : round((float)$nilai, 6) }}
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        @endif
-                    </div>
-                @endforeach
-            @endif
-        </div>
-
+        <a href="{{ route('riwayat-diagnosa.index') }}" class="btn-back">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="19" y1="12" x2="5" y2="12"></line>
+                <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Kembali
+        </a>
     </div>
 </div>
+
+{{-- Ringkasan --}}
+<div class="card">
+    <div class="card-head">
+        <h3>{{ $riwayat->judul ?? 'Hasil Diagnosa' }}</h3>
+        <span class="badge badge-neutral">Tersimpan</span>
+    </div>
+
+    <p class="muted" style="margin:0;">
+        {{ $kesimpulan ?? 'Tidak ada kesimpulan tersimpan.' }}
+    </p>
+</div>
+
+{{-- Gejala yang dipilih --}}
+<div class="card" style="margin-top:16px;">
+    <div class="card-head">
+        <h3>Gejala yang Dipilih</h3>
+        <span class="badge badge-neutral">{{ is_array($gejala) ? count($gejala) : 0 }} gejala</span>
+    </div>
+
+    @if(empty($gejala))
+        <p class="muted" style="margin:0;">Tidak ada data gejala tersimpan.</p>
+    @else
+        <div class="chips">
+            @foreach($gejala as $g)
+                @if(is_array($g))
+                    <div class="chip">
+                        <span class="chip-code">{{ $g['kode_gejala'] ?? ($g['kode'] ?? '-') }}</span>
+                        <span class="chip-name">{{ $g['nama_gejala'] ?? ($g['nama'] ?? ($g['gejala'] ?? '-')) }}</span>
+                        <span class="chip-cf">
+                            CF user:
+                            <b>{{ $g['cf_user'] ?? '-' }}</b>
+                        </span>
+                    </div>
+                @else
+                    <div class="chip">
+                        <span class="chip-code">-</span>
+                        <span class="chip-name">{{ $g }}</span>
+                        <span class="chip-cf">CF user: <b>-</b></span>
+                    </div>
+                @endif
+            @endforeach
+        </div>
+    @endif
+</div>
+
+{{-- Ranking (CF/DS atau Hasil) --}}
+@if(empty($ranking))
+    <div class="card" style="margin-top:16px;">
+        <div class="card-head">
+            <h3>Hasil Diagnosa (Ranking)</h3>
+            <span class="badge badge-warn">Kosong</span>
+        </div>
+        <p class="muted" style="margin:0;">Tidak ada ranking tersimpan.</p>
+    </div>
+@else
+    @foreach($groups as $label => $list)
+        @php
+            $judul = $label === 'CF'
+                ? 'Detail Nilai Certainty Factor (CF)'
+                : ($label === 'DS'
+                    ? 'Detail Nilai Dempster–Shafer (DS)'
+                    : 'Detail Hasil Diagnosa');
+        @endphp
+
+        <div class="card" style="margin-top:16px;">
+            <div class="card-head">
+                <h3>{{ $judul }}</h3>
+                <span class="badge badge-neutral">{{ is_array($list) ? count($list) : 0 }} data</span>
+            </div>
+
+            @if(empty($list))
+                <p class="muted" style="margin:0;">Data {{ $label }} tidak tersedia.</p>
+            @else
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th style="width:60px;">#</th>
+                            <th>Nama Penyakit</th>
+                            <th style="width:160px;">Nilai</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($list as $idx => $row)
+                            @php
+                                $nama  = $row['nama'] ?? $row['nama_penyakit'] ?? $row['penyakit'] ?? '-';
+                                $kode  = $row['kode'] ?? $row['kode_penyakit'] ?? null;
+                                $nilai = $row['nilai'] ?? $row['score'] ?? null;
+                                $isTop = ($idx === 0);
+                            @endphp
+                            <tr class="{{ $isTop ? 'top-row' : '' }}">
+                                <td>{{ $idx + 1 }}</td>
+                                <td>
+                                    @if($kode)
+                                        <span class="tcode">{{ $kode }}</span>
+                                        <span style="margin-left:8px;">{{ $nama }}</span>
+                                    @else
+                                        {{ $nama }}
+                                    @endif
+                                </td>
+                                <td>{{ is_null($nilai) ? '-' : round((float)$nilai, 6) }}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
+        </div>
+    @endforeach
+@endif
+
+<style>
+/* ===== SAMAKAN DENGAN HALAMAN HASIL DIAGNOSA ===== */
+.page-head{
+    max-width:1800px;
+    margin:0 auto 14px;
+    display:flex;
+    align-items:flex-end;
+    justify-content:space-between;
+    gap:14px;
+    flex-wrap:wrap;
+}
+
+/* pill & action */
+.pill-wrap{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+}
+.pill{
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    border-radius:999px;
+    padding:10px 12px;
+    display:flex;
+    gap:10px;
+    align-items:center;
+    font-size:13px;
+}
+.pill-label{ color:#92400e; font-weight:700; }
+.pill-value{ color:#78350f; font-weight:800; }
+
+.btn-back{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 14px;
+    border-radius:999px;
+    background:#ffffff;
+    border:1px solid #fde68a;
+    color:#78350f;
+    text-decoration:none;
+    font-weight:800;
+    font-size:13px;
+    transition:all .2s ease;
+}
+.btn-back:hover{
+    transform: translateY(-1px);
+    border-color:#f59e0b;
+}
+
+/* card */
+.card{
+    max-width:1800px;
+    margin:0 auto;
+    background:#fff;
+    border:1px solid #fde68a;
+    border-radius:16px;
+    padding:18px 20px;
+    box-shadow:0 4px 16px rgba(0,0,0,0.06);
+}
+.card-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+.card h3{
+    margin:0;
+    font-size:16px;
+    font-weight:800;
+    color:#78350f;
+}
+.muted{ color:#92400e; font-weight:500; }
+
+/* badges */
+.badge{
+    display:inline-flex;
+    align-items:center;
+    padding:6px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:700;
+    border:1px solid #fde68a;
+    background:#fffbeb;
+    color:#78350f;
+}
+.badge-neutral{
+    background:#fffef5;
+    border-color:#fde68a;
+    color:#92400e;
+}
+.badge-warn{
+    background:#fef2f2;
+    border-color:#fecaca;
+    color:#7f1d1d;
+}
+
+/* gejala chips */
+.chips{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+}
+.chip{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    background:#ffffff;
+    border:1px solid #fde68a;
+    border-radius:14px;
+    padding:12px 14px;
+}
+.chip-code{
+    display:inline-flex;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    color:#78350f;
+    font-weight:800;
+    font-size:12px;
+    white-space:nowrap;
+}
+.chip-name{
+    flex:1;
+    color:#78350f;
+    font-weight:600;
+    min-width:0;
+}
+.chip-cf{
+    white-space:nowrap;
+    color:#92400e;
+    font-weight:600;
+}
+
+/* table */
+.table-wrap{
+    overflow:auto;
+    border-radius:12px;
+    border:1px solid #fde68a;
+}
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:#fff;
+}
+thead th{
+    text-align:left;
+    font-size:13px;
+    color:#92400e;
+    font-weight:700;
+    padding:12px 12px;
+    background:#fffbeb;
+    border-bottom:1px solid #fde68a;
+}
+tbody td{
+    padding:12px 12px;
+    border-bottom:1px solid #f3f4f6;
+    color:#78350f;
+    font-weight:500;
+}
+.tcode{
+    display:inline-flex;
+    padding:4px 10px;
+    border-radius:999px;
+    background:#fffef5;
+    border:1px solid #fde68a;
+    font-weight:800;
+    color:#78350f;
+    font-size:12px;
+}
+.top-row{
+    background:#fff7ed;
+}
+.top-row td{
+    font-weight:700;
+}
+
+@media (max-width: 900px){
+    .chip{ flex-direction:column; align-items:flex-start; }
+    .chip-cf{ width:100%; }
+}
+</style>
 @endsection

@@ -219,15 +219,6 @@
         transform: translateY(-1px);
     }
 
-    /* Page header */
-    .page-title{
-        color:#111827;
-    }
-
-    .page-subtitle{
-        color:#374151;
-    }
-
     @media (max-width:768px){
         .form-card{ padding:24px; }
         .card-top{ flex-direction:column; align-items:stretch; }

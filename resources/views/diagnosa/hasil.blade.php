@@ -228,18 +228,6 @@
     gap:14px;
     flex-wrap:wrap;
 }
-.page-title{
-    font-size:28px;
-    font-weight:800;
-    color:#78350f;
-    margin:0;
-}
-.page-subtitle{
-    margin:6px 0 0;
-    color:#92400e;
-    font-weight:500;
-}
-
 /* pill top result */
 .pill-wrap{
     display:flex;

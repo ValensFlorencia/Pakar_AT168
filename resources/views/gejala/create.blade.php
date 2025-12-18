@@ -266,14 +266,6 @@
         background: #e5e7eb;
         transform: translateY(-2px);
     }
-    .page-title{
-    color:#000000; /* hitam */
-    }
-
-    .page-subtitle{
-    color:#374151; /* hitam keabu (lebih enak dibaca) */
-    }
-
 
     @media (max-width: 768px) {
         .form-card {

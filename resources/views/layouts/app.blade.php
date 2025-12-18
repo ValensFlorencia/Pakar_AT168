@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Sistem Pakar Ayam')</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/buttons.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
@@ -28,8 +29,8 @@
         /* ================= SIDEBAR - FIXED POSITION ================= */
         .sidebar {
             width: 260px;
-            background: #ffd93d;
-            color: #5a4a2a;
+            background: #fff9c4;
+            color: #000000;
             padding: 0;
             box-shadow: 4px 0 10px rgba(0,0,0,0.1);
             display: flex;
@@ -62,7 +63,7 @@
         .logo h1{
             font-size: 18px;
             font-weight: 700;
-            color: #5a4a2a;
+            color: #000000;
 
             /* ✅ center */
             width: 100%;
@@ -77,12 +78,12 @@
 
         .sidebar-title {
             font-size: 11px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
             text-transform: uppercase;
             opacity: 0.7;
             padding: 0 22px 6px;
-            color: #5a4a2a;
+            color: #000000;
         }
 
         .menu-item {
@@ -101,7 +102,7 @@
         .menu-item i {
             width: 20px;
             text-align: center;
-            color: #5a4a2a;
+            color: #000000;
         }
 
         .menu-item:hover {
@@ -124,7 +125,7 @@
 
         .sidebar-logout {
             width: 100%;
-            background: #b45309;
+            background: #fcd34d;
             color: #fff;
             border: none;
             padding: 10px 18px;
@@ -148,7 +149,7 @@
         /* ================= MAIN AREA - DENGAN MARGIN LEFT ================= */
         .main-content {
             flex: 1;
-            background: #fff8e1;
+            background: #ffffff;
             display: flex;
             flex-direction: column;
             margin-left: 260px;
@@ -157,7 +158,7 @@
 
         /* HEADER */
         .header {
-            background: #fff8e1;
+            background: #ffffff;
             padding: 16px 40px;
             display: flex;
             justify-content: flex-end;
@@ -195,19 +196,6 @@
         .content {
             padding: 35px 40px 40px;
             flex: 1;
-        }
-
-        .page-title {
-            font-size: 30px;
-            font-weight: 700;
-            color: #5a4a2a;
-            margin-bottom: 8px;
-        }
-
-        .page-subtitle {
-            color: #8b7355;
-            font-size: 15px;
-            margin-bottom: 25px;
         }
 
         .footer {
@@ -252,7 +240,7 @@
         /* tabel di halaman penyakit */
         .card {
             background: #ffffff;
-            border-radius: 18px;
+            border-radius: 17px;
             padding: 20px 25px 25px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.08);
         }
@@ -265,7 +253,7 @@
         }
 
         .card-header h3 {
-            font-size: 18px;
+            font-size: 15px;
             color: #5a4a2a;
         }
 
@@ -367,6 +355,34 @@
             }
         }
     </style>
+    <style>
+  /* ===== GLOBAL TYPOGRAPHY (samain seperti Data Gejala) ===== */
+  body{
+    font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    letter-spacing:-0.1px;
+    color:#111827;
+    background:#ffffff; /* optional kalau mau putih */
+  }
+
+  /* header halaman */
+  .page-title{
+    color:#111827;
+    font-weight:600;     /* seperti Data Gejala (lebih “clean”) */
+    letter-spacing:-0.2px;
+  }
+
+  .page-subtitle{
+    color:#374151;
+    font-weight:500;
+    line-height:1.6;
+  }
+
+  /* teks umum biar ga “bold semua” */
+  p, li, td, span, div{
+    font-weight:400;
+  }
+</style>
+
 </head>
 <body>
 <div class="container">

@@ -119,12 +119,7 @@
         </p>
     </div>
 </div>
-
 <style>
-    body{
-        font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        letter-spacing:-0.1px;
-    }
 
     /* HERO */
     .hero-card{
@@ -159,7 +154,7 @@
         border-radius:999px;
         background:#fffbeb;
         border:1px solid #fde68a;
-        color:#92400e;
+        color:#111827; /* ✅ jadi hitam */
         font-weight:900;
         font-size:12px;
         margin-bottom:10px;
@@ -170,13 +165,13 @@
         margin:0 0 10px 0;
         font-size:22px;
         font-weight:900;
-        color:#78350f;
+        color:#111827; /* ✅ jadi hitam */
         letter-spacing:-0.2px;
     }
 
     .hero-text{
         margin:0 0 16px 0;
-        color:#92400e;
+        color:#111827; /* ✅ jadi hitam */
         font-weight:600;
         line-height:1.65;
         font-size:14px;
@@ -209,12 +204,12 @@
     }
     .mini-title{
         font-weight:900;
-        color:#78350f;
+        color:#111827; /* ✅ jadi hitam */
         font-size:13px;
         margin-bottom:2px;
     }
     .mini-sub{
-        color:#92400e;
+        color:#111827; /* ✅ jadi hitam */
         font-weight:600;
         font-size:12px;
         opacity:.85;
@@ -250,7 +245,7 @@
     .stat-title{
         font-size:13px;
         font-weight:900;
-        color:#92400e;
+        color:#111827; /* ✅ jadi hitam */
         opacity:.9;
         margin-bottom:6px;
     }
@@ -258,7 +253,7 @@
     .stat-number{
         font-size:28px;
         font-weight:900;
-        color:#78350f;
+        color:#111827; /* ✅ jadi hitam */
         letter-spacing:-0.4px;
         line-height:1;
     }
@@ -316,13 +311,13 @@
 
     .info-title{
         font-weight:900;
-        color:#78350f;
+        color:#111827; /* ✅ jadi hitam */
         font-size:15px;
     }
 
     .info-text{
         margin:0;
-        color:#92400e;
+        color:#111827; /* ✅ jadi hitam */
         font-weight:600;
         font-size:13px;
         line-height:1.65;
@@ -346,24 +341,24 @@
     }
 
     .btn-submit{
-        background:#f59e0b;
+        background:#fcd34d;
         color:#ffffff;
         box-shadow:0 4px 12px rgba(245,158,11,0.25);
     }
     .btn-submit:hover{
-        background:#d97706;
+        background:#fcd34d;
         transform: translateY(-1px);
         box-shadow:0 6px 16px rgba(245,158,11,0.35);
     }
 
     .btn-outline{
         background:#ffffff;
-        color:#78350f;
+        color:#111827; /* ✅ jadi hitam */
         border:2px solid #fde68a;
     }
     .btn-outline:hover{
         transform: translateY(-1px);
-        border-color:#f59e0b;
+        border-color:#fff9c4;
     }
 
     @media (max-width:1024px){
@@ -377,5 +372,4 @@
         .hero-actions .btn{ width:100%; justify-content:center; }
     }
 </style>
-
 @endsection

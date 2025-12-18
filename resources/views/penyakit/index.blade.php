@@ -260,13 +260,6 @@
         background:#fee2e2;
         transform:translateY(-1px);
     }
-    .page-title{
-    color:#111827;   /* hitam elegan */
-    }
-
-    .page-subtitle{
-        color:#374151;   /* abu gelap */
-    }
 
     @media (max-width:768px){
         .form-card{ padding:24px; }

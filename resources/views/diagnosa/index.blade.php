@@ -151,15 +151,6 @@
         --sidebar-w: 260px; /* ubah kalau sidebar beda */
     }
 
-    body{
-        font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        letter-spacing:-0.1px;
-        font-weight:400;
-    }
-
-    .page-title{ font-size:30px; font-weight:800; color:#111827; letter-spacing:-0.4px; }
-    .page-subtitle{ font-size:15px; font-weight:500; color:#6b7280; line-height:1.7; }
-
     /* Stats */
     .stats-banner{
         display:flex; gap:14px; margin-bottom:18px;
@@ -363,8 +354,6 @@
     }
 
     /* Global tone */
-    .page-subtitle, .info-box-text, .stat-label, .gejala-name, .confirm-info, .confirm-name{ font-weight:500 !important; }
-    .page-title, .form-label, .stat-number, .confirm-title{ font-weight:800 !important; }
     .hint-pill, .gejala-code, .confirm-sub, .confirm-code, .confirm-cf{ font-weight:700 !important; }
 
     /* ===== Modal Konfirmasi (punyamu tetap) ===== */

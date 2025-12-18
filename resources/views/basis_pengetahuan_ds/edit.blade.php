@@ -280,15 +280,6 @@
         background: #e5e7eb;
         transform: translateY(-2px);
     }
-
-    .page-title{
-        color:#111827;
-    }
-
-    .page-subtitle{
-        color:#374151;
-    }
-
     @media (max-width: 768px) {
         .form-card { padding: 24px; }
         .gejala-row{ flex-direction:column; align-items:stretch; }

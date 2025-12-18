@@ -88,6 +88,7 @@
         box-shadow:0 4px 20px rgba(0,0,0,0.08);
         border:1px solid #fde68a;
         max-width:1800px;
+        margin:0 auto;
     }
 
     .card-top{
@@ -98,13 +99,14 @@
         margin-bottom:18px;
         padding-bottom:18px;
         border-bottom:1px solid #fde68a;
+        flex-wrap:wrap;
     }
 
     .card-title{
         margin:0;
         font-size:18px;
-        font-weight:700;
-        color:#000;
+        font-weight:900;
+        color:#111827;
         display:flex;
         align-items:center;
         gap:10px;
@@ -117,11 +119,13 @@
         align-items:center;
         gap:8px;
         font-size:13px;
-        color:#000;
-        opacity:.85;
+        color:#6b7280;
+        font-weight:600;
+        opacity:1;
     }
     .card-subtitle i{ font-size:12px; }
 
+    /* Table */
     .table-wrap{
         overflow-x:auto;
         border-radius:12px;
@@ -133,22 +137,34 @@
         width:100%;
         border-collapse:collapse;
         font-size:14px;
-        background:white;
+        background:#fff;
     }
 
     .table thead{
-        background:#fff9c4;
+        background:#fffbeb; /* lebih konsisten */
     }
 
-    .table th, .table td{
-        padding:12px 12px;
+    .table th{
+        padding:14px 14px;
         text-align:left;
-        vertical-align:top;
+        vertical-align:middle;
         border-bottom:1px solid #fde68a;
+        color:#374151;
+        font-weight:800;
+        white-space:nowrap;
+    }
+
+    .table td{
+        padding:14px 14px;
+        text-align:left;
+        vertical-align:middle;
+        border-bottom:1px solid #fde68a;
+        color:#111827;
+        font-weight:500;
     }
 
     .table tbody tr:nth-child(even){ background:#fffef5; }
-    .table tbody tr:hover{ background:#fff9c4; }
+    .table tbody tr:hover{ background:#fff7ed; }
 
     .action-group{
         display:flex;
@@ -161,50 +177,50 @@
     .empty{
         text-align:center;
         padding:22px;
-        color:#000;
-        font-weight:600;
-        background:#fffbeb;
+        color:#6b7280;
+        font-weight:700;
+        background:#fffef5;
     }
 
-    /* Buttons */
+    /* Buttons (samain feel dengan halaman lain) */
     .btn{
-        padding:13px 28px;
+        padding:12px 18px;
         border:none;
-        border-radius:10px;
-        font-size:15px;
-        font-weight:600;
+        border-radius:12px;
+        font-size:14px;
+        font-weight:900;
         cursor:pointer;
         text-decoration:none;
         display:inline-flex;
         align-items:center;
-        gap:8px;
+        gap:10px;
         transition:all .2s ease;
         white-space:nowrap;
     }
 
     .btn-submit{
-        background:#f59e0b; /* SOLID */
+        background:#f59e0b;
         color:#ffffff;
-        box-shadow:0 4px 12px rgba(245,158,11,0.3);
+        box-shadow:0 4px 12px rgba(245,158,11,0.25);
     }
     .btn-submit:hover{
         background:#d97706;
-        transform:translateY(-2px);
-        box-shadow:0 6px 16px rgba(245,158,11,0.4);
+        transform: translateY(-1px);
+        box-shadow:0 6px 16px rgba(245,158,11,0.35);
     }
 
     .btn-mini{
-        border:none;
+        padding:8px 12px;
         border-radius:999px;
-        padding:8px 14px;
-        font-size:13px;
-        font-weight:700;
+        font-size:12px;
+        font-weight:900;
         cursor:pointer;
         text-decoration:none;
         display:inline-flex;
         align-items:center;
-        gap:8px;
-        transition:all .2s ease;
+        gap:6px;
+        border:none;
+        transition:.2s ease;
         white-space:nowrap;
     }
 
@@ -219,22 +235,14 @@
     }
 
     .btn-delete{
-        background:#fef2f2;
-        color:#b91c1c;
+        background:#fee2e2;
+        color:#991b1b;
         border:1px solid #fecaca;
     }
     .btn-delete:hover{
-        background:#fee2e2;
+        background:#fecaca;
         transform:translateY(-1px);
     }
-    .page-title{
-    color:#111827;   /* hitam elegan */
-    }
-
-    .page-subtitle{
-        color:#374151;   /* abu gelap */
-    }
-
 
     @media (max-width:768px){
         .form-card{ padding:24px; }

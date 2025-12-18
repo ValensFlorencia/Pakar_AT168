@@ -26,18 +26,20 @@ class UserController extends Controller
         $roles = ['admin', 'pakar', 'user'];
 
         $request->validate([
-            'name' => ['required','string','max:255'],
-            'email' => ['required','email','max:255','unique:users,email'],
-            'password' => ['required','string','min:6','confirmed'],
-            'role' => ['required', Rule::in($roles)],
+            'name' => 'required',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'role' => 'required|in:pakar,peternak,pemilik',
         ]);
+
 
         User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'password' => bcrypt($request->password),
+            'role' => $request->role, // ✅ AMBIL DARI FORM
         ]);
+
 
         return redirect()->route('users.index')->with('success', 'User berhasil ditambahkan.');
     }

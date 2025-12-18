@@ -98,10 +98,6 @@
 </div>
 
 <style>
-    body{
-        font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        letter-spacing:-0.1px;
-    }
 
     /* Card */
     .form-card{
@@ -128,7 +124,7 @@
         margin:0;
         font-size:18px;
         font-weight:900;
-        color:#5a4a2a;
+        color:#111827;           /* ✅ hitam */
         display:flex;
         align-items:center;
         gap:10px;
@@ -141,8 +137,8 @@
         align-items:center;
         gap:8px;
         font-size:13px;
-        color:#92400e;
-        opacity:.85;
+        color:#6b7280;           /* ✅ abu */
+        opacity:1;
         font-weight:600;
     }
 
@@ -184,39 +180,50 @@
     }
 
     .table thead{
-        background:#fff9c4;
+        background:#fffbeb;
     }
 
-    .table th, .table td{
+    .table th{
         padding:14px 14px;
         border-bottom:1px solid #fde68a;
         text-align:left;
         vertical-align:middle;
+        color:#374151;           /* ✅ abu gelap */
+        font-weight:800;
+    }
+
+    .table td{
+        padding:14px 14px;
+        border-bottom:1px solid #fde68a;
+        text-align:left;
+        vertical-align:middle;
+        color:#111827;           /* ✅ hitam */
+        font-weight:500;
     }
 
     .table tbody tr:nth-child(even){ background:#fffef5; }
-    .table tbody tr:hover{ background:#fff9c4; }
+    .table tbody tr:hover{ background:#fff7ed; }
 
     .empty{
         text-align:center;
         padding:22px;
-        color:#8b7355;
+        color:#6b7280;           /* ✅ abu */
         font-weight:700;
-        background:#fffbeb;
+        background:#fffef5;
     }
 
     .user-name{
-        font-weight:800;
-        color:#78350f;
+        font-weight:700;
+        color:#111827;           /* ✅ hitam */
     }
 
     .user-email{
         font-size:13px;
-        color:#92400e;
+        color:#6b7280;           /* ✅ abu */
         font-weight:600;
     }
 
-    /* Role badge */
+    /* Role badge (biarin sesuai warna role) */
     .badge-role{
         padding:6px 12px;
         border-radius:999px;
@@ -286,8 +293,8 @@
     }
 
     .btn-edit{
-        background:#fff9c4;
-        color:#78350f;
+        background:#fffbeb;
+        color:#111827;           /* ✅ hitam */
         border:1px solid #fde68a;
     }
 
