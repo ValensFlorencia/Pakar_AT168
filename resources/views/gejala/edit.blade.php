@@ -12,11 +12,31 @@
 
 <div class="form-card">
 
+    {{-- ✅ ALERT VALIDASI (biar keliatan kalau gagal) --}}
+    @if ($errors->any())
+        <div class="alert alert-error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                <strong>Terjadi kesalahan:</strong>
+                <ul>
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+    @endif
+
     <form action="{{ route('gejala.update', $gejala->id) }}" method="POST">
         @csrf
         @method('PUT')
 
-        {{-- KODE GEJALA --}}
+        {{-- ✅ kirim kode_gejala walau input tampilan readonly --}}
+        <input type="hidden" name="kode_gejala" value="{{ $gejala->kode_gejala }}">
+
+        {{-- KODE GEJALA (tampilan saja) --}}
         <div class="form-group">
             <label class="form-label">
                 <i class="fas fa-barcode"></i>
@@ -51,20 +71,6 @@
             </div>
         </div>
 
-        {{-- KETERANGAN --}}
-        <div class="form-group">
-            <label class="form-label">
-                <i class="fas fa-file-alt"></i>
-                Keterangan
-                <span class="optional">(opsional)</span>
-            </label>
-            <textarea
-                name="keterangan"
-                rows="3"
-                class="form-input form-textarea"
-                placeholder="Tambahkan catatan atau informasi tambahan...">{{ old('keterangan', $gejala->keterangan) }}</textarea>
-        </div>
-
         {{-- TOMBOL AKSI --}}
         <div class="form-actions">
             <button type="submit" class="btn btn-submit">
@@ -90,6 +96,26 @@
         border: 1px solid #fde68a;
         max-width: 1800px;
     }
+
+    /* ✅ Alert Styling */
+    .alert {
+        padding: 16px 20px;
+        border-radius: 12px;
+        margin-bottom: 30px;
+        display: flex;
+        gap: 14px;
+        align-items: flex-start;
+        border: 1px solid transparent;
+    }
+    .alert-error {
+        background: #fef2f2;
+        border-color: #fecaca;
+        color: #991b1b;
+    }
+    .alert-icon { font-size: 20px; margin-top: 2px; }
+    .alert-content strong { display:block; margin-bottom:8px; font-weight:600; }
+    .alert-content ul { margin:0; padding-left: 20px; }
+    .alert-content li { margin-bottom:4px; font-size:14px; }
 
     /* Form Group */
     .form-group {
@@ -117,14 +143,6 @@
         margin-left: 2px;
     }
 
-    .optional {
-        color: #000;
-        font-weight: 400;
-        font-size: 13px;
-        opacity: 0.7;
-        margin-left: 4px;
-    }
-
     /* Form Input */
     .form-input {
         width: 100%;
@@ -143,11 +161,6 @@
         border-color: #f59e0b;
         background: #ffffff;
         box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1);
-    }
-
-    .form-input::placeholder {
-        color: #000;
-        opacity: 0.6;
     }
 
     .form-textarea {
@@ -173,9 +186,7 @@
         opacity: 0.8;
     }
 
-    .input-hint i {
-        font-size: 12px;
-    }
+    .input-hint i { font-size: 12px; }
 
     /* Form Actions */
     .form-actions {
@@ -200,9 +211,7 @@
         transition: all 0.2s ease;
     }
 
-    .btn i {
-        font-size: 14px;
-    }
+    .btn i { font-size: 14px; }
 
     .btn-submit {
         background: #f59e0b;
@@ -216,10 +225,6 @@
         box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
     }
 
-    .btn-submit:active {
-        transform: translateY(0);
-    }
-
     .btn-cancel {
         background: #f3f4f6;
         color: #000;
@@ -230,20 +235,10 @@
         transform: translateY(-2px);
     }
 
-
     @media (max-width: 768px) {
-        .form-card {
-            padding: 24px;
-        }
-
-        .form-actions {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+        .form-card { padding: 24px; }
+        .form-actions { flex-direction: column; }
+        .btn { width: 100%; justify-content: center; }
     }
 </style>
 

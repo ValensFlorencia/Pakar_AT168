@@ -22,34 +22,36 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // =====================
-    // DIAGNOSA (PAKAR, PETERNAK, PEMILIK)
+    // DIAGNOSA (PEMILIK, PAKAR, PETERNAK)
     // =====================
-    Route::middleware(['role:pakar,peternak,pemilik'])->group(function () {
+    Route::middleware(['role:pemilik,pakar,peternak'])->group(function () {
         Route::get('/diagnosa', [DiagnosaController::class, 'index'])->name('diagnosa.index');
         Route::post('/diagnosa/proses', [DiagnosaController::class, 'proses'])->name('diagnosa.proses');
         Route::post('/diagnosa/hasil', [DiagnosaController::class, 'hasil'])->name('diagnosa.hasil');
+    });
 
+    // =====================
+    // RIWAYAT DIAGNOSA (PEMILIK, PAKAR) ✅ (peternak TIDAK)
+    // =====================
+    Route::middleware(['role:pemilik,pakar,peternak'])->group(function () {
         Route::get('/riwayat-diagnosa', [RiwayatDiagnosaController::class, 'index'])->name('riwayat-diagnosa.index');
         Route::get('/riwayat-diagnosa/{riwayat}', [RiwayatDiagnosaController::class, 'show'])->name('riwayat-diagnosa.show');
     });
 
+
     // =========================================================
-    // MASTER DATA - VIEW (PAKAR, PETERNAK, PEMILIK) => BISA LIHAT
+    // MASTER DATA - VIEW (PEMILIK, PAKAR) ✅
+    // (Kalau kamu mau peternak bisa lihat list penyakit/gejala, tambah "peternak" di role)
     // =========================================================
-    Route::middleware(['role:pakar,peternak,pemilik'])->group(function () {
-        // penyakit & gejala (view)
+    Route::middleware(['role:pemilik,pakar'])->group(function () {
         Route::get('penyakit', [PenyakitController::class, 'index'])->name('penyakit.index');
         Route::get('gejala', [GejalaController::class, 'index'])->name('gejala.index');
-
-        // jika butuh halaman detail (opsional)
-        // Route::get('penyakit/{penyakit}', [PenyakitController::class, 'show'])->name('penyakit.show');
-        // Route::get('gejala/{gejala}', [GejalaController::class, 'show'])->name('gejala.show');
     });
 
     // =========================================================
-    // BASIS CF & DS - VIEW (PAKAR + PEMILIK) => BISA LIHAT
+    // BASIS CF & DS - VIEW (PEMILIK, PAKAR) ✅
     // =========================================================
-    Route::middleware(['role:pakar,pemilik'])->group(function () {
+    Route::middleware(['role:pemilik,pakar'])->group(function () {
 
         // CF view
         Route::get('basis-cf', [BasisPengetahuanCFController::class, 'index'])
@@ -67,15 +69,15 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // =========================================================
-    // MASTER DATA + BASIS CF/DS - CRUD (KHUSUS PAKAR)
+    // CRUD MASTER DATA + BASIS CF/DS (PEMILIK, PAKAR) ✅
     // =========================================================
-    Route::middleware(['role:pakar'])->group(function () {
+    Route::middleware(['role:pemilik,pakar'])->group(function () {
 
-        // CRUD penyakit & gejala (tanpa index/show karena view sudah dibuka untuk semua)
+        // CRUD penyakit & gejala (kecuali index/show)
         Route::resource('penyakit', PenyakitController::class)->except(['index', 'show']);
         Route::resource('gejala', GejalaController::class)->except(['index', 'show']);
 
-        // CF CRUD khusus pakar (tanpa index/show)
+        // CF CRUD (tanpa index/show)
         Route::resource('basis-cf', BasisPengetahuanCFController::class)
             ->except(['index', 'show'])
             ->names([
@@ -86,7 +88,7 @@ Route::middleware(['auth'])->group(function () {
                 'destroy' => 'basis_pengetahuan_cf.destroy',
             ]);
 
-        // DS CRUD khusus pakar (tanpa index/show)
+        // DS CRUD (tanpa index/show)
         Route::resource('basis-ds', BasisPengetahuanDSController::class)
             ->parameters(['basis-ds' => 'basis_ds'])
             ->except(['index', 'show'])
@@ -100,7 +102,7 @@ Route::middleware(['auth'])->group(function () {
     });
 
     // =====================
-    // KELOLA PENGGUNA (KHUSUS PEMILIK)
+    // KELOLA PENGGUNA (KHUSUS PEMILIK) ✅
     // =====================
     Route::middleware(['role:pemilik'])->group(function () {
         Route::resource('users', UserController::class);

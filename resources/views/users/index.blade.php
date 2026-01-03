@@ -6,7 +6,7 @@
 
 <div class="page-header" style="margin-bottom:30px;">
     <h1 class="page-title">Data Users</h1>
-    <p class="page-subtitle">Kelola akun dan role (admin, pakar, user).</p>
+    <p class="page-subtitle">Kelola akun dan role.</p>
 </div>
 
 {{-- Alert --}}

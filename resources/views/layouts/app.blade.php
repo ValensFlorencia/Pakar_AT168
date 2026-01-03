@@ -71,7 +71,6 @@
             justify-content: center;
         }
 
-
         .sidebar-section {
             padding: 18px 0 6px;
         }
@@ -154,6 +153,7 @@
             flex-direction: column;
             margin-left: 260px;
             width: calc(100% - 260px);
+            min-height: 100vh;
         }
 
         /* HEADER */
@@ -355,37 +355,42 @@
             }
         }
     </style>
+
     <style>
-  /* ===== GLOBAL TYPOGRAPHY (samain seperti Data Gejala) ===== */
-  body{
-    font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    letter-spacing:-0.1px;
-    color:#111827;
-    background:#ffffff; /* optional kalau mau putih */
-  }
+        /* ===== GLOBAL TYPOGRAPHY (samain seperti Data Gejala) ===== */
+        body{
+            font-family:'Inter', -apple-system, BlinkMacSystemFont,'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            letter-spacing:-0.1px;
+            color:#111827;
+            background:#ffffff; /* optional kalau mau putih */
+        }
 
-  /* header halaman */
-  .page-title{
-    color:#111827;
-    font-weight:600;     /* seperti Data Gejala (lebih “clean”) */
-    letter-spacing:-0.2px;
-  }
+        /* header halaman */
+        .page-title{
+            color:#111827;
+            font-weight:600;
+            letter-spacing:-0.2px;
+        }
 
-  .page-subtitle{
-    color:#374151;
-    font-weight:500;
-    line-height:1.6;
-  }
+        .page-subtitle{
+            color:#374151;
+            font-weight:500;
+            line-height:1.6;
+        }
 
-  /* teks umum biar ga “bold semua” */
-  p, li, td, span, div{
-    font-weight:400;
-  }
-</style>
+        /* teks umum biar ga “bold semua” */
+        p, li, td, span, div{
+            font-weight:400;
+        }
+    </style>
 
 </head>
 <body>
 <div class="container">
+
+    @php
+        $role = Auth::check() ? (Auth::user()->role ?? null) : null;
+    @endphp
 
     {{-- SIDEBAR FIXED - TIDAK AKAN SCROLL --}}
     <div class="sidebar">
@@ -404,34 +409,38 @@
             </a>
         </div>
 
-        <div class="sidebar-section">
-            <div class="sidebar-title">DATA</div>
+        {{-- DATA (PEMILIK + PAKAR SAJA) --}}
+        @if(in_array($role, ['pemilik','pakar']))
+            <div class="sidebar-section">
+                <div class="sidebar-title">DATA</div>
 
-            <a href="{{ route('gejala.index') }}"
-               class="menu-item {{ request()->is('gejala*') ? 'active' : '' }}">
-                <i class="fas fa-stethoscope"></i>
-                <span class="label">Data Gejala</span>
-            </a>
+                <a href="{{ route('gejala.index') }}"
+                   class="menu-item {{ request()->is('gejala*') ? 'active' : '' }}">
+                    <i class="fas fa-stethoscope"></i>
+                    <span class="label">Data Gejala</span>
+                </a>
 
-            <a href="{{ route('penyakit.index') }}"
-               class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
-                <i class="fas fa-virus"></i>
-                <span class="label">Data Penyakit</span>
-            </a>
+                <a href="{{ route('penyakit.index') }}"
+                   class="menu-item {{ request()->is('penyakit*') ? 'active' : '' }}">
+                    <i class="fas fa-virus"></i>
+                    <span class="label">Data Penyakit</span>
+                </a>
 
-            <a href="{{ route('basis_pengetahuan_cf.index') }}"
-               class="menu-item {{ request()->is('basis-cf*') ? 'active' : '' }}">
-                <i class="fas fa-brain"></i>
-                <span class="label">Basis Pengetahuan CF</span>
-            </a>
+                <a href="{{ route('basis_pengetahuan_cf.index') }}"
+                   class="menu-item {{ request()->is('basis-cf*') ? 'active' : '' }}">
+                    <i class="fas fa-brain"></i>
+                    <span class="label">Basis Pengetahuan CF</span>
+                </a>
 
-            <a href="{{ route('basis_pengetahuan_ds.index') }}"
-               class="menu-item {{ request()->is('basis-ds*') ? 'active' : '' }}">
-                <i class="fas fa-network-wired"></i>
-                <span class="label">Basis Pengetahuan DS</span>
-            </a>
-        </div>
+                <a href="{{ route('basis_pengetahuan_ds.index') }}"
+                   class="menu-item {{ request()->is('basis-ds*') ? 'active' : '' }}">
+                    <i class="fas fa-network-wired"></i>
+                    <span class="label">Basis Pengetahuan DS</span>
+                </a>
+            </div>
+        @endif
 
+        {{-- DIAGNOSA (SEMUA ROLE) --}}
         <div class="sidebar-section">
             <div class="sidebar-title">DIAGNOSA</div>
 
@@ -441,24 +450,30 @@
                 <span class="label">Diagnosa Penyakit</span>
             </a>
 
-            <a href="{{ route('riwayat-diagnosa.index') }}"
-               class="menu-item {{ request()->is('riwayat-diagnosa*') ? 'active' : '' }}">
-                <i class="fas fa-history"></i>
-                <span class="label">Riwayat Diagnosa</span>
-            </a>
+            {{-- Riwayat: pemilik + pakar + peternak (tapi data difilter di controller) --}}
+            @if(in_array($role, ['pemilik','pakar','peternak']))
+                <a href="{{ route('riwayat-diagnosa.index') }}"
+                   class="menu-item {{ request()->is('riwayat-diagnosa*') ? 'active' : '' }}">
+                    <i class="fas fa-history"></i>
+                    <span class="label">Riwayat Diagnosa</span>
+                </a>
+            @endif
         </div>
 
-        <div class="sidebar-section">
-            <div class="sidebar-title">ROLE</div>
+        {{-- ROLE (PEMILIK SAJA) --}}
+        @if($role === 'pemilik')
+            <div class="sidebar-section">
+                <div class="sidebar-title">ROLE</div>
 
-            <a href="{{ route('users.index') }}"
-               class="menu-item {{ request()->is('users*') ? 'active' : '' }}">
-                <i class="fas fa-users"></i>
-                <span class="label">Pengguna</span>
-            </a>
-        </div>
+                <a href="{{ route('users.index') }}"
+                   class="menu-item {{ request()->is('users*') ? 'active' : '' }}">
+                    <i class="fas fa-users"></i>
+                    <span class="label">Pengguna</span>
+                </a>
+            </div>
+        @endif
 
-        {{-- ✅ LOGOUT PALING BAWAH SIDEBAR --}}
+        {{-- LOGOUT PALING BAWAH SIDEBAR --}}
         <div class="sidebar-footer">
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
@@ -469,11 +484,11 @@
             </form>
         </div>
     </div>
+    {{-- END SIDEBAR --}}
 
-    {{-- MAIN AREA - DENGAN MARGIN LEFT --}}
+    {{-- ✅ INI YANG HILANG DI FILE KAMU: MAIN CONTENT --}}
     <div class="main-content">
 
-        {{-- ✅ HEADER SEKARANG PROFILE (Bukan Logout) --}}
         <div class="header">
             <div class="profile-box">
                 <span class="profile-name">
@@ -492,7 +507,9 @@
         <div class="footer">
             © {{ date('Y') }} Sistem Pakar Diagnosa Penyakit Ayam
         </div>
+
     </div>
+    {{-- END MAIN CONTENT --}}
 
 </div>
 </body>

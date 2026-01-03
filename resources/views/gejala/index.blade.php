@@ -12,6 +12,30 @@
 
 <div class="form-card">
 
+    {{-- ALERT ERROR (untuk pesan dari controller) --}}
+    @if(session('error'))
+        <div class="alert alert-error">
+            <div class="alert-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <div class="alert-content">
+                <strong>{{ session('error') }}</strong>
+            </div>
+        </div>
+    @endif
+
+    {{-- ALERT SUCCESS --}}
+    @if(session('success'))
+        <div class="alert alert-success">
+            <div class="alert-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <div class="alert-content">
+                <strong>{{ session('success') }}</strong>
+            </div>
+        </div>
+    @endif
+
     <div class="card-top">
         <div>
             <h2 class="card-title">
@@ -30,6 +54,12 @@
         </a>
     </div>
 
+    @php
+        // Controller idealnya kirim: $usedGejalaIds = [...id gejala yang dipakai di CF/DS...]
+        // Ini biar view tidak error kalau variabel belum ada.
+        $usedGejalaIds = $usedGejalaIds ?? [];
+    @endphp
+
     <div class="table-wrap">
         <table class="table">
             <thead>
@@ -37,11 +67,15 @@
                     <th style="width:60px; text-align:center;">#</th>
                     <th style="width:140px;">Kode</th>
                     <th>Nama Gejala</th>
-                    <th style="width:220px; text-align:center;">Aksi</th>
+                    <th style="width:260px; text-align:center;">Aksi</th>
                 </tr>
             </thead>
             <tbody>
             @forelse($gejalas as $index => $gejala)
+                @php
+                    $isUsed = in_array($gejala->id, $usedGejalaIds, true);
+                @endphp
+
                 <tr>
                     <td style="text-align:center;">{{ $index + 1 }}</td>
                     <td style="font-weight:700;">{{ $gejala->kode_gejala }}</td>
@@ -53,13 +87,18 @@
                                 <i class="fas fa-pen"></i> Edit
                             </a>
 
+                            {{-- ✅ tombol tetap "Hapus", tapi kalau sudah dipakai -> alert & batal --}}
                             <form action="{{ route('gejala.destroy', $gejala->id) }}"
                                   method="POST"
-                                  onsubmit="return confirm('Yakin ingin menghapus gejala ini?');"
-                                  style="margin:0;">
+                                  style="margin:0;"
+                                  onsubmit="return {{ $isUsed
+                                        ? "alert('Gejala ini tidak bisa dihapus karena sudah digunakan di basis pengetahuan/diagnosa.') || false"
+                                        : "confirm('Yakin ingin menghapus gejala ini?')"
+                                  }};">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-mini btn-delete">
+
+                                <button type="submit" class="btn-mini btn-delete {{ $isUsed ? 'btn-disabled' : '' }}">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </form>
@@ -81,6 +120,40 @@
 </div>
 
 <style>
+    /* ALERT (umum) */
+    .alert{
+        padding: 14px 16px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .alert-icon{
+        font-size: 15px;
+        line-height: 1;
+        margin-top: 1px;
+        flex-shrink: 0;
+    }
+
+    .alert-content{ flex: 1; }
+    .alert-content strong{ font-weight: 500; }
+
+    /* SUKSES */
+    .alert-success{
+        background:#ecfdf5;
+        border:1px solid #86efac;
+        color:#065f46;
+    }
+
+    /* ERROR */
+    .alert-error{
+        background:#fef2f2;
+        border:1px solid #fecaca;
+        color:#991b1b;
+    }
+
     .form-card{
         background:#ffffff;
         border-radius:16px;
@@ -140,9 +213,7 @@
         background:#fff;
     }
 
-    .table thead{
-        background:#fffbeb; /* lebih konsisten */
-    }
+    .table thead{ background:#fffbeb; }
 
     .table th{
         padding:14px 14px;
@@ -182,7 +253,7 @@
         background:#fffef5;
     }
 
-    /* Buttons (samain feel dengan halaman lain) */
+    /* Buttons */
     .btn{
         padding:12px 18px;
         border:none;
@@ -242,6 +313,16 @@
     .btn-delete:hover{
         background:#fecaca;
         transform:translateY(-1px);
+    }
+
+    /* ✅ disabled state (tampil sama, tapi cursor tidak boleh + hover tidak berubah) */
+    .btn-disabled{
+        opacity:.75;
+        cursor:not-allowed;
+    }
+    .btn-disabled:hover{
+        transform:none;
+        background:#fee2e2;
     }
 
     @media (max-width:768px){

@@ -10,14 +10,14 @@
     $topCF = $cfSorted->first();
     $topDS = $dsSorted->first();
 
-    // util tampil angka
-    $fmtVal = fn($v) => is_null($v) ? '-' : number_format((float)$v, 4);
-    $fmtPct = fn($v) => is_null($v) ? '-' : number_format(((float)$v) * 100, 2) . '%';
+    $top3CF = $cfSorted->take(3)->values();
+    $top3DS = $dsSorted->take(3)->values();
 
-    // penyakit utama: prioritas DS, fallback CF
+    $fmtVal = fn($v) => is_null($v) ? '-' : number_format((float)$v, 4);
+
+    // utama: ikut controller (kalau ada), fallback ke DS lalu CF
     $utama = $topDS ?: $topCF;
 
-    // gejala terpilih (kalau dikirim dari controller)
     $gejalaList = collect($gejalaTerpilih ?? []);
 @endphp
 
@@ -33,13 +33,21 @@
         <div class="pill">
             <span class="pill-label">Top CF</span>
             <span class="pill-value">
-                @if($topCF) {{ $topCF['kode'] }} ({{ $topCF['persen'] }}%) @else - @endif
+                @if($topCF)
+                    {{ $topCF['kode'] ?? '-' }} — {{ $topCF['nama'] ?? '-' }} ({{ number_format((float)($topCF['persen'] ?? 0), 2) }}%)
+                @else
+                    -
+                @endif
             </span>
         </div>
         <div class="pill">
             <span class="pill-label">Top DS</span>
             <span class="pill-value">
-                @if($topDS) {{ $topDS['kode'] }} ({{ $topDS['persen'] }}%) @else - @endif
+                @if($topDS)
+                    {{ $topDS['kode'] ?? '-' }} — {{ $topDS['nama'] ?? '-' }} ({{ number_format((float)($topDS['persen'] ?? 0), 2) }}%)
+                @else
+                    -
+                @endif
             </span>
         </div>
     </div>
@@ -54,40 +62,85 @@
         </span>
     </div>
 
-    <p class="muted" style="margin:0;">
-        {{ $kesimpulan ?? 'Tidak ditemukan kesimpulan.' }}
-    </p>
+    {{-- Kesimpulan utama TANPA box panjang --}}
+    <div class="conclusion-line">
+        @if($utama)
+            <span class="conclusion-label">Kesimpulan Utama:</span>
+            <span class="conclusion-main">
+                {{ $utama['nama'] ?? '-' }}
+                <span class="conclusion-pct">({{ number_format((float)($utama['persen'] ?? 0), 2) }}%)</span>
+            </span>
+
+            @if(isset($metodeDominan))
+                <span class="conclusion-meta">— Metode: <b>{{ $metodeDominan }}</b></span>
+            @endif
+        @else
+            <span class="muted-inline">Tidak ditemukan penyakit dominan.</span>
+        @endif
+    </div>
+
+    {{-- ✅ BLOK INI DIHAPUS supaya tulisan “3 kemungkinan ...” hilang --}}
+    {{--
+    @if(!empty($kesimpulan))
+        <p class="conclusion-note">{{ $kesimpulan }}</p>
+    @endif
+    --}}
 
     <div class="divider"></div>
 
+    {{-- TOP 3 CF + TOP 3 DS (dua box) --}}
     <div class="summary-grid">
+        {{-- CF TOP 3 --}}
         <div class="summary-box">
-            <div class="summary-title">Certainty Factor (Top)</div>
-            @if($topCF)
-                <div class="summary-main">
-                    <span class="code">{{ $topCF['kode'] }}</span>
-                    <span class="name">{{ $topCF['nama'] }}</span>
-                </div>
-                <div class="summary-sub">
-                    Nilai: <b>{{ $fmtVal($topCF['nilai']) }}</b> · Persen: <b>{{ $topCF['persen'] }}%</b>
-                </div>
-            @else
+            <div class="summary-title">Certainty Factor (Top 3)</div>
+
+            @if($top3CF->isEmpty())
                 <div class="summary-sub">Tidak ada hasil CF.</div>
+            @else
+                <div class="top3">
+                    @foreach($top3CF as $i => $row)
+                        <div class="top3-row {{ $i === 0 ? 'is-top' : '' }}">
+                            <div class="top3-left">
+                                <span class="rank">#{{ $i+1 }}</span>
+                                <div class="who">
+                                    <span class="code">{{ $row['kode'] ?? '-' }}</span>
+                                    <span class="name">{{ $row['nama'] ?? '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="top3-right">
+                                <span class="val">{{ $fmtVal($row['nilai'] ?? null) }}</span>
+                                <span class="pct">{{ number_format((float)($row['persen'] ?? 0), 2) }}%</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
         </div>
 
+        {{-- DS TOP 3 --}}
         <div class="summary-box">
-            <div class="summary-title">Dempster–Shafer (Top)</div>
-            @if($topDS)
-                <div class="summary-main">
-                    <span class="code">{{ $topDS['kode'] }}</span>
-                    <span class="name">{{ $topDS['nama'] }}</span>
-                </div>
-                <div class="summary-sub">
-                    Nilai: <b>{{ $fmtVal($topDS['nilai']) }}</b> · Persen: <b>{{ $topDS['persen'] }}%</b>
-                </div>
-            @else
+            <div class="summary-title">Dempster–Shafer (Top 3)</div>
+
+            @if($top3DS->isEmpty())
                 <div class="summary-sub">Tidak ada hasil DS.</div>
+            @else
+                <div class="top3">
+                    @foreach($top3DS as $i => $row)
+                        <div class="top3-row {{ $i === 0 ? 'is-top' : '' }}">
+                            <div class="top3-left">
+                                <span class="rank">#{{ $i+1 }}</span>
+                                <div class="who">
+                                    <span class="code">{{ $row['kode'] ?? '-' }}</span>
+                                    <span class="name">{{ $row['nama'] ?? '-' }}</span>
+                                </div>
+                            </div>
+                            <div class="top3-right">
+                                <span class="val">{{ $fmtVal($row['nilai'] ?? null) }}</span>
+                                <span class="pct">{{ number_format((float)($row['persen'] ?? 0), 2) }}%</span>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             @endif
         </div>
     </div>
@@ -143,10 +196,10 @@
                     @php $isTop = ($i === 0); @endphp
                     <tr class="{{ $isTop ? 'top-row' : '' }}">
                         <td>{{ $i+1 }}</td>
-                        <td><span class="tcode">{{ $row['kode'] }}</span></td>
-                        <td>{{ $row['nama'] }}</td>
+                        <td><span class="tcode">{{ $row['kode'] ?? '-' }}</span></td>
+                        <td>{{ $row['nama'] ?? '-' }}</td>
                         <td>{{ $fmtVal($row['nilai'] ?? null) }}</td>
-                        <td>{{ ($row['persen'] ?? null) !== null ? number_format((float)$row['persen'],2).'%' : '-' }}</td>
+                        <td>{{ number_format((float)($row['persen'] ?? 0), 2) }}%</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -181,10 +234,10 @@
                     @php $isTop = ($i === 0); @endphp
                     <tr class="{{ $isTop ? 'top-row' : '' }}">
                         <td>{{ $i+1 }}</td>
-                        <td><span class="tcode">{{ $row['kode'] }}</span></td>
-                        <td>{{ $row['nama'] }}</td>
+                        <td><span class="tcode">{{ $row['kode'] ?? '-' }}</span></td>
+                        <td>{{ $row['nama'] ?? '-' }}</td>
                         <td>{{ $fmtVal($row['nilai'] ?? null) }}</td>
-                        <td>{{ ($row['persen'] ?? null) !== null ? number_format((float)$row['persen'],2).'%' : '-' }}</td>
+                        <td>{{ number_format((float)($row['persen'] ?? 0), 2) }}%</td>
                     </tr>
                 @endforeach
                 </tbody>
@@ -228,7 +281,6 @@
     gap:14px;
     flex-wrap:wrap;
 }
-/* pill top result */
 .pill-wrap{
     display:flex;
     gap:10px;
@@ -243,9 +295,17 @@
     gap:10px;
     align-items:center;
     font-size:13px;
+    max-width:820px;
 }
-.pill-label{ color:#92400e; font-weight:700; }
-.pill-value{ color:#78350f; font-weight:800; }
+.pill-label{ color:#92400e; font-weight:800; flex-shrink:0; }
+.pill-value{
+    color:#78350f;
+    font-weight:800;
+    min-width:0;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
 
 /* card */
 .card{
@@ -305,6 +365,43 @@
     margin:14px 0;
 }
 
+/* Kesimpulan ringkas */
+.conclusion-line{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:8px 10px;
+    padding:10px 12px;
+    border:1px solid #fde68a;
+    border-radius:12px;
+    background:#fffef5;
+}
+.conclusion-label{
+    font-size:12px;
+    font-weight:900;
+    color:#92400e;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+}
+.conclusion-main{
+    font-size:14px;
+    font-weight:900;
+    color:#78350f;
+}
+.conclusion-pct{
+    font-weight:800;
+    color:#92400e;
+    margin-left:6px;
+}
+.conclusion-meta{
+    font-weight:700;
+    color:#92400e;
+}
+.muted-inline{
+    font-weight:600;
+    color:#92400e;
+}
+
 /* summary grid */
 .summary-grid{
     display:grid;
@@ -320,28 +417,8 @@
 .summary-title{
     font-size:12px;
     color:#92400e;
-    font-weight:700;
-    margin-bottom:8px;
-}
-.summary-main{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    flex-wrap:wrap;
-}
-.summary-main .code{
-    display:inline-flex;
-    padding:4px 10px;
-    border-radius:999px;
-    background:#fff;
-    border:1px solid #fde68a;
     font-weight:800;
-    color:#78350f;
-    font-size:12px;
-}
-.summary-main .name{
-    color:#78350f;
-    font-weight:700;
+    margin-bottom:8px;
 }
 .summary-sub{
     margin-top:8px;
@@ -350,12 +427,81 @@
     font-weight:500;
 }
 
-/* gejala chips */
-.chips{
+/* Top 3 list */
+.top3{ display:flex; flex-direction:column; gap:10px; }
+.top3-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:12px 12px;
+    border:1px solid #fde68a;
+    border-radius:14px;
+    background:#ffffff;
+}
+.top3-row.is-top{
+    background:#fffbeb;
+    border-color:#f59e0b;
+    box-shadow:0 10px 22px rgba(245,158,11,0.12);
+}
+.top3-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    min-width:0;
+}
+.top3-left .rank{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:42px;
+    height:36px;
+    border-radius:12px;
+    background:#fffef5;
+    border:1px solid #fde68a;
+    font-weight:800;
+    color:#78350f;
+    flex-shrink:0;
+}
+.top3-left .who{
     display:flex;
     flex-direction:column;
-    gap:10px;
+    gap:4px;
+    min-width:0;
 }
+.top3-left .code{
+    display:inline-flex;
+    width:max-content;
+    padding:3px 8px;
+    border-radius:999px;
+    background:#fffbeb;
+    border:1px solid #fde68a;
+    color:#78350f;
+    font-weight:800;
+    font-size:12px;
+}
+.top3-left .name{
+    color:#78350f;
+    font-weight:800;
+    font-size:13px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:360px;
+}
+.top3-right{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:2px;
+    flex-shrink:0;
+    min-width:110px;
+}
+.top3-right .val{ font-weight:900; color:#78350f; font-size:13px; }
+.top3-right .pct{ font-weight:800; color:#92400e; font-size:12px; }
+
+/* gejala chips */
+.chips{ display:flex; flex-direction:column; gap:10px; }
 .chip{
     display:flex;
     align-items:center;
@@ -395,16 +541,12 @@
     border-radius:12px;
     border:1px solid #fde68a;
 }
-table{
-    width:100%;
-    border-collapse:collapse;
-    background:#fff;
-}
+table{ width:100%; border-collapse:collapse; background:#fff; }
 thead th{
     text-align:left;
     font-size:13px;
     color:#92400e;
-    font-weight:700;
+    font-weight:800;
     padding:12px 12px;
     background:#fffbeb;
     border-bottom:1px solid #fde68a;
@@ -425,28 +567,22 @@ tbody td{
     color:#78350f;
     font-size:12px;
 }
-.top-row{
-    background:#fff7ed;
-}
-.top-row td{
-    font-weight:700;
-}
+.top-row{ background:#fff7ed; }
+.top-row td{ font-weight:700; }
 
 /* tips */
-.tips{
-    margin:0;
-    padding-left:18px;
-    color:#78350f;
-}
-.tips li{
-    margin:8px 0;
-    font-weight:500;
-}
+.tips{ margin:0; padding-left:18px; color:#78350f; }
+.tips li{ margin:8px 0; font-weight:500; }
 
 @media (max-width: 900px){
     .summary-grid{ grid-template-columns:1fr; }
     .chip{ flex-direction:column; align-items:flex-start; }
     .chip-cf{ width:100%; }
+
+    .top3-right{ align-items:flex-start; }
+    .top3-row{ flex-direction:column; align-items:flex-start; }
+    .top3-left .name{ max-width:100%; white-space:normal; }
+    .pill{ max-width:100%; }
 }
 </style>
 
