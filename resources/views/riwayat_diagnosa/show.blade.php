@@ -56,6 +56,10 @@
     $fmtPct = fn($v) => is_null($v) ? '-' : number_format((float)$v, 2) . '%';
 
     $dt = $riwayat->diagnosa_at ?? $riwayat->created_at;
+
+    // ✅ solusiMap dari controller: [kode_penyakit => solusi]
+    $solusiMap = $solusiMap ?? [];
+    $getSolusi = fn($kode) => $kode ? ($solusiMap[$kode] ?? null) : null;
 @endphp
 
 <div class="page-head">
@@ -145,7 +149,17 @@
             @else
                 <div class="top3">
                     @foreach($top3CF as $i => $row)
-                        <div class="top3-row {{ $i === 0 ? 'is-top' : '' }}">
+                        @php
+                            $kode = $getKode($row);
+                            $nama = $getNama($row) ?? '-';
+                            $sol  = $getSolusi($kode);
+                        @endphp
+
+                        <button type="button"
+                                class="top3-row clickable {{ $i === 0 ? 'is-top' : '' }}"
+                                data-kode="{{ e($kode) }}"
+                                data-nama="{{ e($nama) }}"
+                                data-solusi="{{ e($sol ?? '') }}">
                             <div class="top3-left">
                                 <span class="rank">#{{ $i+1 }}</span>
                                 <div class="who">
@@ -157,7 +171,7 @@
                                 <span class="val">{{ $fmtVal($getNilai($row)) }}</span>
                                 <span class="pct">{{ $fmtPct($getPersen($row)) }}</span>
                             </div>
-                        </div>
+                        </button>
                     @endforeach
                 </div>
             @endif
@@ -172,7 +186,17 @@
             @else
                 <div class="top3">
                     @foreach($top3DS as $i => $row)
-                        <div class="top3-row {{ $i === 0 ? 'is-top' : '' }}">
+                        @php
+                            $kode = $getKode($row);
+                            $nama = $getNama($row) ?? '-';
+                            $sol  = $getSolusi($kode);
+                        @endphp
+
+                        <button type="button"
+                                class="top3-row clickable {{ $i === 0 ? 'is-top' : '' }}"
+                                data-kode="{{ e($kode) }}"
+                                data-nama="{{ e($nama) }}"
+                                data-solusi="{{ e($sol ?? '') }}">
                             <div class="top3-left">
                                 <span class="rank">#{{ $i+1 }}</span>
                                 <div class="who">
@@ -184,11 +208,26 @@
                                 <span class="val">{{ $fmtVal($getNilai($row)) }}</span>
                                 <span class="pct">{{ $fmtPct($getPersen($row)) }}</span>
                             </div>
-                        </div>
+                        </button>
                     @endforeach
                 </div>
             @endif
         </div>
+    </div>
+</div>
+
+{{-- MODAL SOLUSI --}}
+<div id="solusiModal" class="modal-backdrop" aria-hidden="true">
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="solusiTitle">
+        <div class="modal-head">
+            <div>
+                <div class="modal-kode" id="solusiKode">-</div>
+                <div class="modal-title" id="solusiTitle">Solusi Penanganan</div>
+            </div>
+            <button type="button" class="modal-close" id="solusiClose">✕</button>
+        </div>
+
+        <div class="modal-body" id="solusiBody">-</div>
     </div>
 </div>
 
@@ -292,353 +331,56 @@
         </div>
     @endif
 </div>
+<script>
+const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
 
-{{-- SARAN --}}
-<div class="card" style="margin-top:16px;">
-    <div class="card-head">
-        <h3>Saran Penanganan Awal</h3>
-        <span class="badge badge-neutral">Rekomendasi</span>
-    </div>
+(function () {
+    const modal    = document.getElementById('solusiModal');
+    const btnClose = document.getElementById('solusiClose');
 
-    @if($utama)
-        <ul class="tips">
-            <li><b>Isolasi sementara</b> ayam yang sakit untuk mencegah penularan (jika gejala mengarah ke penyakit menular).</li>
-            <li><b>Periksa kondisi kandang:</b> kebersihan, ventilasi, dan kepadatan ayam.</li>
-            <li><b>Observasi 24 jam:</b> catat perubahan nafsu makan, feses, dan pernapasan.</li>
-            <li><b>Konfirmasi pakar/dokter hewan</b> untuk penanganan sesuai protokol.</li>
-        </ul>
-        <div class="muted" style="margin-top:10px;">
-            Penyakit dominan: <b>{{ $getNama($utama) ?? '-' }}</b>
-        </div>
-    @else
-        <p class="muted" style="margin:0;">Belum ada penyakit dominan.</p>
-    @endif
-</div>
+    const elKode  = document.getElementById('solusiKode');
+    const elTitle = document.getElementById('solusiTitle');
+    const elBody  = document.getElementById('solusiBody');
 
-<style>
-.page-head{
-    max-width:1800px;
-    margin:0 auto 14px;
-    display:flex;
-    align-items:flex-end;
-    justify-content:space-between;
-    gap:14px;
-    flex-wrap:wrap;
-}
-.pill-wrap{
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-    align-items:center;
-}
-.pill{
-    background:#fffbeb;
-    border:1px solid #fde68a;
-    border-radius:999px;
-    padding:10px 12px;
-    display:flex;
-    gap:10px;
-    align-items:center;
-    font-size:13px;
-    max-width:820px;
-}
-.pill.big{ padding:12px 14px; }
-.pill-label{ color:#92400e; font-weight:800; flex-shrink:0; }
-.pill-value{
-    color:#78350f;
-    font-weight:800;
-    min-width:0;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-.btn-back{
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:10px 14px;
-    border-radius:999px;
-    background:#ffffff;
-    border:1px solid #fde68a;
-    color:#78350f;
-    text-decoration:none;
-    font-weight:900;
-    font-size:13px;
-    transition:all .2s ease;
-}
-.btn-back:hover{
-    transform: translateY(-1px);
-    border-color:#f59e0b;
-    box-shadow:0 0 0 4px rgba(245,158,11,0.14);
-}
+    if (!modal) return;
 
-.pill-top-wrap{
-    max-width:1800px;
-    margin: 0 auto 14px;
-    display:flex;
-    gap:10px;
-    flex-wrap:wrap;
-}
+    function openModal(kode, nama) {
+        const key = String(kode || '').trim().toUpperCase();
 
-.card{
-    max-width:1800px;
-    margin:0 auto;
-    background:#fff;
-    border:1px solid #fde68a;
-    border-radius:16px;
-    padding:18px 20px;
-    box-shadow:0 4px 16px rgba(0,0,0,0.06);
-}
-.card-head{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-bottom:10px;
-}
-.card h3{
-    margin:0;
-    font-size:16px;
-    font-weight:900;
-    color:#78350f;
-}
-.muted{ color:#92400e; font-weight:600; }
+        // kalau solusiByKode array, aksesnya tetap bisa pakai ["P01"]
+        const solusi = solusiByKode[key];
 
-.badge{
-    display:inline-flex;
-    align-items:center;
-    padding:6px 10px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:800;
-    border:1px solid #fde68a;
-    background:#fffbeb;
-    color:#78350f;
-}
-.badge-ok{
-    background:#ecfdf5;
-    border-color:#86efac;
-    color:#065f46;
-}
-.badge-warn{
-    background:#fef2f2;
-    border-color:#fecaca;
-    color:#7f1d1d;
-}
-.badge-neutral{
-    background:#fffef5;
-    border-color:#fde68a;
-    color:#92400e;
-}
+        elKode.textContent = key || '-';
+        elTitle.textContent = nama ? `Solusi Penanganan — ${nama}` : 'Solusi Penanganan';
+        elBody.textContent  = (solusi && String(solusi).trim().length > 0)
+            ? solusi
+            : 'Solusi belum diisi pada data penyakit.';
 
-.divider{
-    height:1px;
-    background:#f3f4f6;
-    margin:14px 0;
-}
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+    }
 
-.conclusion-line{
-    display:flex;
-    align-items:center;
-    flex-wrap:wrap;
-    gap:8px 10px;
-    padding:10px 12px;
-    border:1px solid #fde68a;
-    border-radius:12px;
-    background:#fffef5;
-}
-.conclusion-label{
-    font-size:12px;
-    font-weight:900;
-    color:#92400e;
-    text-transform:uppercase;
-    letter-spacing:.3px;
-}
-.conclusion-main{
-    font-size:14px;
-    font-weight:900;
-    color:#78350f;
-}
-.conclusion-pct{
-    font-weight:900;
-    color:#92400e;
-    margin-left:6px;
-}
-.conclusion-meta{
-    font-weight:800;
-    color:#92400e;
-}
-.muted-inline{
-    font-weight:700;
-    color:#92400e;
-}
+    function closeModal() {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+    }
 
-.summary-grid{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
-}
-.summary-box{
-    background:#fffef5;
-    border:1px solid #fde68a;
-    border-radius:14px;
-    padding:12px 14px;
-}
-.summary-title{
-    font-size:12px;
-    color:#92400e;
-    font-weight:900;
-    margin-bottom:8px;
-}
-.summary-sub{
-    margin-top:8px;
-    font-size:13px;
-    color:#92400e;
-    font-weight:700;
-}
+    document.querySelectorAll('.top3-row.clickable').forEach(row => {
+        row.addEventListener('click', () => {
+            openModal(row.dataset.kode, row.dataset.nama);
+        });
+    });
 
-.top3{ display:flex; flex-direction:column; gap:10px; }
-.top3-row{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:12px 12px;
-    border:1px solid #fde68a;
-    border-radius:14px;
-    background:#ffffff;
-}
-.top3-row.is-top{
-    background:#fffbeb;
-    border-color:#f59e0b;
-    box-shadow:0 10px 22px rgba(245,158,11,0.12);
-}
-.top3-left{ display:flex; align-items:center; gap:12px; min-width:0; }
-.top3-left .rank{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width:42px;
-    height:36px;
-    border-radius:12px;
-    background:#fffef5;
-    border:1px solid #fde68a;
-    font-weight:900;
-    color:#78350f;
-    flex-shrink:0;
-}
-.top3-left .who{ display:flex; flex-direction:column; gap:4px; min-width:0; }
-.top3-left .code{
-    display:inline-flex;
-    width:max-content;
-    padding:3px 8px;
-    border-radius:999px;
-    background:#fffbeb;
-    border:1px solid #fde68a;
-    color:#78350f;
-    font-weight:900;
-    font-size:12px;
-}
-.top3-left .name{
-    color:#78350f;
-    font-weight:900;
-    font-size:13px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    max-width:360px;
-}
-.top3-right{
-    display:flex;
-    flex-direction:column;
-    align-items:flex-end;
-    gap:2px;
-    flex-shrink:0;
-    min-width:110px;
-}
-.top3-right .val{ font-weight:900; color:#78350f; font-size:13px; }
-.top3-right .pct{ font-weight:900; color:#92400e; font-size:12px; }
+    btnClose?.addEventListener('click', closeModal);
 
-.chips{ display:flex; flex-direction:column; gap:10px; }
-.chip{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    background:#ffffff;
-    border:1px solid #fde68a;
-    border-radius:14px;
-    padding:12px 14px;
-}
-.chip-code{
-    display:inline-flex;
-    padding:4px 10px;
-    border-radius:999px;
-    background:#fffbeb;
-    border:1px solid #fde68a;
-    color:#78350f;
-    font-weight:900;
-    font-size:12px;
-    white-space:nowrap;
-}
-.chip-name{
-    flex:1;
-    color:#78350f;
-    font-weight:700;
-    min-width:0;
-}
-.chip-cf{
-    white-space:nowrap;
-    color:#92400e;
-    font-weight:800;
-}
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal();
+    });
 
-.table-wrap{
-    overflow:auto;
-    border-radius:12px;
-    border:1px solid #fde68a;
-}
-table{ width:100%; border-collapse:collapse; background:#fff; }
-thead th{
-    text-align:left;
-    font-size:13px;
-    color:#92400e;
-    font-weight:900;
-    padding:12px 12px;
-    background:#fffbeb;
-    border-bottom:1px solid #fde68a;
-}
-tbody td{
-    padding:12px 12px;
-    border-bottom:1px solid #f3f4f6;
-    color:#78350f;
-    font-weight:700;
-}
-.tcode{
-    display:inline-flex;
-    padding:4px 10px;
-    border-radius:999px;
-    background:#fffef5;
-    border:1px solid #fde68a;
-    font-weight:900;
-    color:#78350f;
-    font-size:12px;
-}
-.top-row{ background:#fff7ed; }
-.top-row td{ font-weight:900; }
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+    });
+})();
+</script>
 
-.tips{ margin:0; padding-left:18px; color:#78350f; }
-.tips li{ margin:8px 0; font-weight:700; }
-
-@media (max-width: 900px){
-    .summary-grid{ grid-template-columns:1fr; }
-    .chip{ flex-direction:column; align-items:flex-start; }
-    .chip-cf{ width:100%; }
-
-    .top3-right{ align-items:flex-start; }
-    .top3-row{ flex-direction:column; align-items:flex-start; }
-    .top3-left .name{ max-width:100%; white-space:normal; }
-    .pill{ max-width:100%; }
-}
-</style>
 @endsection

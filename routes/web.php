@@ -19,12 +19,14 @@ Route::middleware(['auth'])->group(function () {
     // =====================
     // DASHBOARD (SEMUA ROLE)
     // =====================
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware(['auth'])
+    ->name('dashboard');
 
     // =====================
     // DIAGNOSA (PEMILIK, PAKAR, PETERNAK)
     // =====================
-    Route::middleware(['role:pemilik,pakar,peternak'])->group(function () {
+    Route::middleware(['role:pemilik,peternak'])->group(function () {
         Route::get('/diagnosa', [DiagnosaController::class, 'index'])->name('diagnosa.index');
         Route::post('/diagnosa/proses', [DiagnosaController::class, 'proses'])->name('diagnosa.proses');
         Route::post('/diagnosa/hasil', [DiagnosaController::class, 'hasil'])->name('diagnosa.hasil');

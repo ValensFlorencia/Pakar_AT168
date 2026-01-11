@@ -28,8 +28,8 @@
         </div>
     @endif
 
-    {{-- ⛔ HTML & SCRIPT DI BAWAH TIDAK DIUBAH (fungsi tetap) --}}
-    <form action="{{ route('basis_pengetahuan_ds.store') }}" method="POST">
+    {{-- ✅ hanya tambah id + novalidate (tampilan tidak berubah) --}}
+    <form id="form-basis-ds" action="{{ route('basis_pengetahuan_ds.store') }}" method="POST" novalidate>
         @csrf
 
         {{-- Penyakit --}}
@@ -70,7 +70,6 @@
 
                     <select name="gejalas[0][ds_value]" class="form-input ds-select" required>
                         <option value="">-- Bobot DS --</option>
-                        <option value="0">0 - Tidak</option>
                         <option value="0.2">0.2 - Sedikit Yakin</option>
                         <option value="0.4">0.4 - Cukup Yakin</option>
                         <option value="0.6">0.6 - Hampir Yakin</option>
@@ -108,6 +107,7 @@
     </form>
 </div>
 
+{{-- ============ CSS FORM (tetap seperti kamu, tidak diubah) ============ --}}
 <style>
     .form-card {
         background: #ffffff;
@@ -118,7 +118,6 @@
         max-width: 1800px;
     }
 
-    /* Alert */
     .alert {
         padding: 16px 20px;
         border-radius: 12px;
@@ -140,7 +139,6 @@
     .alert-content ul { margin: 0; padding-left: 20px; }
     .alert-content li { margin-bottom: 4px; font-size: 14px; }
 
-    /* Form */
     .form-group { margin-bottom: 28px; }
 
     .form-label {
@@ -161,12 +159,11 @@
         margin-left: 2px;
     }
 
-    /* ✅ Samain CF: input polos putih */
     .form-input {
         width: 100%;
         padding: 14px 16px;
         border: 2px solid #fde68a;
-        background: #ffffff;  /* putih */
+        background: #ffffff;
         border-radius: 10px;
         font-size: 14px;
         color:#000;
@@ -193,7 +190,6 @@
 
     .input-hint i { font-size: 12px; }
 
-    /* Section gejala */
     .gejala-section {
         background: #ffffff;
         border: 1px solid #fde68a;
@@ -220,7 +216,6 @@
         gap: 12px;
     }
 
-    /* ✅ Samain CF: row gejala tanpa background */
     .gejala-row {
         display: flex;
         gap: 12px;
@@ -233,7 +228,6 @@
     .gejala-select { flex: 2; }
     .ds-select { flex: 1; }
 
-    /* ✅ Samain CF: delete putih */
     .btn-delete {
         background: #ffffff;
         border: 2px solid #fecaca;
@@ -255,24 +249,21 @@
         transform: translateY(-1px);
     }
 
-    /* ✅ Samain CF: tombol add putih */
     .btn-add {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 14px;
-    padding: 12px 18px;
-    border-radius: 10px;
-
-    background: #ffffff;
-    appearance: none;
-    -webkit-appearance: none;
-
-    color: #000;
-    border: 2px solid #fed7aa;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 14px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        background: #ffffff;
+        appearance: none;
+        -webkit-appearance: none;
+        color: #000;
+        border: 2px solid #fed7aa;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .btn-add:hover {
@@ -281,7 +272,6 @@
         box-shadow: 0 4px 12px rgba(234, 88, 12, 0.18);
     }
 
-    /* Actions */
     .form-actions {
         display: flex;
         gap: 12px;
@@ -337,11 +327,77 @@
     }
 </style>
 
+{{-- ✅ SweetAlert2 --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.swal2-popup.swal-yellow {
+    width: 360px !important;
+    padding: 18px 20px !important;
+    border-radius: 14px;
+    border: 2px solid #f6c453;
+    box-shadow: 0 12px 35px rgba(0,0,0,.18);
+}
+.swal2-popup.swal-yellow .swal2-icon {
+    width: 56px !important;
+    height: 56px !important;
+    margin: 12px auto 8px !important;
+}
+.swal2-popup.swal-yellow .swal2-icon.swal2-warning {
+    border-color: #f6c453 !important;
+    color: #f6c453 !important;
+}
+.swal2-popup.swal-yellow .swal2-title {
+    font-size: 18px !important;
+    font-weight: 700;
+    margin: 6px 0 4px !important;
+    color: #3a2a00;
+}
+.swal2-popup.swal-yellow .swal2-html-container {
+    font-size: 14px !important;
+    line-height: 1.4;
+    margin: 4px 0 10px !important;
+    color: #5a4300;
+}
+.swal2-popup.swal-yellow .swal2-confirm.btn-yellow {
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    border-radius: 10px !important;
+    background: #f6c453 !important;
+    color: #3a2a00 !important;
+    border: 0 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 16px rgba(246,196,83,.35);
+}
+</style>
 
 <script>
     // ✅ dari controller DS: $existingMap (penyakit_id => [gejala_id...])
     const existingMap = @json($existingMap ?? []);
 
+    function swalWarn(msg) {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Lengkapi Data',
+            text: msg,
+            confirmButtonText: 'OK',
+            buttonsStyling: false,
+            customClass: { popup: 'swal-yellow', confirmButton: 'btn-yellow' }
+        });
+    }
+
+    function swalCantDelete() {
+        return Swal.fire({
+            icon: 'warning',
+            title: 'Tidak Bisa Dihapus',
+            text: 'Minimal harus ada 1 gejala!',
+            confirmButtonText: 'OK',
+            buttonsStyling: false,
+            customClass: { popup: 'swal-yellow', confirmButton: 'btn-yellow' }
+        });
+    }
+
+    // ✅ DISABLE LOGIC (DB + anti duplikat antar row)
     function refreshGejalaOptions() {
         const penyakitId = document.getElementById('penyakit-select')?.value ?? "";
 
@@ -376,26 +432,64 @@
                 }
             });
 
+            // kalau sedang terpilih tapi ternyata sudah ada di DB → reset
             if (currentValue && alreadyInDb.includes(currentValue)) {
                 select.value = "";
             }
         });
     }
 
-    document.addEventListener('DOMContentLoaded', refreshGejalaOptions);
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('form-basis-ds');
 
-    document.addEventListener('change', function(e) {
-        if (e.target.id === 'penyakit-select' || e.target.classList.contains('gejala-select')) {
-            refreshGejalaOptions();
-        }
+        // ✅ saat awal load
+        refreshGejalaOptions();
+
+        // ✅ validasi submit -> SweetAlert
+        form.addEventListener('submit', function(e) {
+            const penyakit = document.getElementById('penyakit-select')?.value ?? '';
+            if (!penyakit) {
+                e.preventDefault();
+                swalWarn('Lengkapi data yang belum lengkap!');
+                document.getElementById('penyakit-select')?.focus();
+                return;
+            }
+
+            const rows = form.querySelectorAll('.gejala-row');
+            for (let row of rows) {
+                const gejala = row.querySelector('.gejala-select')?.value ?? '';
+                const ds     = row.querySelector('.ds-select')?.value ?? '';
+
+                if (!gejala) {
+                    e.preventDefault();
+                    swalWarn('Lengkapi data yang belum lengkap!');
+                    row.querySelector('.gejala-select')?.focus();
+                    return;
+                }
+
+                if (!ds) {
+                    e.preventDefault();
+                    swalWarn('Lengkapi data yang belum lengkap!');
+                    row.querySelector('.ds-select')?.focus();
+                    return;
+                }
+            }
+        });
+
+        // ✅ refresh saat penyakit / gejala berubah
+        document.addEventListener('change', function(e) {
+            if (e.target.id === 'penyakit-select' || e.target.classList.contains('gejala-select')) {
+                refreshGejalaOptions();
+            }
+        });
     });
 
     let index = 1;
 
     function tambahGejala() {
-        let wrapper = document.getElementById('gejala-wrapper');
+        const wrapper = document.getElementById('gejala-wrapper');
 
-        let html = `
+        const html = `
         <div class="gejala-row">
             <select name="gejalas[${index}][gejala_id]" class="form-input gejala-select" required>
                 <option value="">-- Pilih Gejala --</option>
@@ -406,7 +500,6 @@
 
             <select name="gejalas[${index}][ds_value]" class="form-input ds-select" required>
                 <option value="">-- Bobot DS --</option>
-                <option value="0">0 - Tidak</option>
                 <option value="0.2">0.2 - Sedikit Yakin</option>
                 <option value="0.4">0.4 - Cukup Yakin</option>
                 <option value="0.6">0.6 - Hampir Yakin</option>
@@ -421,18 +514,20 @@
         wrapper.insertAdjacentHTML('beforeend', html);
         index++;
 
+        // ✅ setelah tambah row, refresh disable option
         refreshGejalaOptions();
     }
 
     function hapusBaris(btn) {
-        let wrapper = document.getElementById('gejala-wrapper');
-        let rows = wrapper.querySelectorAll('.gejala-row');
+        const wrapper = document.getElementById('gejala-wrapper');
+        const rows = wrapper.querySelectorAll('.gejala-row');
 
         if (rows.length > 1) {
             btn.closest('.gejala-row').remove();
+            // ✅ setelah hapus row, refresh disable option
             refreshGejalaOptions();
         } else {
-            alert('Minimal harus ada 1 gejala!');
+            swalCantDelete();
         }
     }
 </script>

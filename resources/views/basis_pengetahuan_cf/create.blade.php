@@ -11,7 +11,7 @@
 
 <div class="form-card">
 
-    {{-- ALERT VALIDASI (tidak mengubah fungsi) --}}
+    {{-- ALERT VALIDASI BACKEND --}}
     @if ($errors->any())
         <div class="alert alert-error">
             <div class="alert-icon">
@@ -28,8 +28,10 @@
         </div>
     @endif
 
-    {{-- ⛔ HTML & SCRIPT DI BAWAH TIDAK DIUBAH (fungsi tetap) --}}
-    <form action="{{ route('basis_pengetahuan_cf.store') }}" method="POST">
+    <form id="form-basis-cf"
+          action="{{ route('basis_pengetahuan_cf.store') }}"
+          method="POST"
+          novalidate>
         @csrf
 
         {{-- Penyakit --}}
@@ -39,11 +41,15 @@
                 Nama Penyakit <span class="required">*</span>
             </label>
 
-            {{-- ✅ kasih ID biar JS bisa baca penyakit yang dipilih --}}
-            <select name="penyakit_id" id="penyakit-select" class="form-input form-select" required>
+            <select name="penyakit_id"
+                    id="penyakit-select"
+                    class="form-input form-select"
+                    required>
                 <option value="">-- Pilih Penyakit --</option>
                 @foreach($penyakits as $p)
-                    <option value="{{ $p->id }}">{{ $p->kode_penyakit }} - {{ $p->nama_penyakit }}</option>
+                    <option value="{{ $p->id }}">
+                        {{ $p->kode_penyakit }} - {{ $p->nama_penyakit }}
+                    </option>
                 @endforeach
             </select>
 
@@ -53,7 +59,7 @@
             </div>
         </div>
 
-        {{-- Gejala Section --}}
+        {{-- Gejala & CF --}}
         <div class="gejala-section">
             <div class="section-label">
                 <i class="fas fa-list-check"></i>
@@ -62,16 +68,21 @@
 
             <div id="gejala-wrapper">
                 <div class="gejala-row">
-                    <select name="gejalas[0][gejala_id]" class="form-input gejala-select" required>
+                    <select name="gejalas[0][gejala_id]"
+                            class="form-input gejala-select"
+                            required>
                         <option value="">-- Pilih Gejala --</option>
                         @foreach($gejalas as $g)
-                            <option value="{{ $g->id }}">{{ $g->kode_gejala }} - {{ $g->nama_gejala }}</option>
+                            <option value="{{ $g->id }}">
+                                {{ $g->kode_gejala }} - {{ $g->nama_gejala }}
+                            </option>
                         @endforeach
                     </select>
 
-                    <select name="gejalas[0][cf_value]" class="form-input cf-select" required>
+                    <select name="gejalas[0][cf_value]"
+                            class="form-input cf-select"
+                            required>
                         <option value="">-- Bobot CF --</option>
-                        <option value="0">0 - Tidak</option>
                         <option value="0.2">0.2 - Sedikit Yakin</option>
                         <option value="0.4">0.4 - Cukup Yakin</option>
                         <option value="0.6">0.6 - Hampir Yakin</option>
@@ -79,7 +90,7 @@
                         <option value="1">1 - Sangat Yakin</option>
                     </select>
 
-                    <button type="button" class="btn-delete" onclick="hapusBaris(this)" title="Hapus baris">✕</button>
+                    <button type="button" class="btn-delete" onclick="hapusBaris(this)">✕</button>
                 </div>
             </div>
 
@@ -93,7 +104,7 @@
             </div>
         </div>
 
-        {{-- Action Buttons --}}
+        {{-- Action --}}
         <div class="form-actions">
             <button type="submit" class="btn btn-submit">
                 <i class="fas fa-save"></i>
@@ -105,10 +116,12 @@
                 Kembali
             </a>
         </div>
-
     </form>
 </div>
 
+{{-- =======================
+     CSS TAMPILAN (SAMA SEPERTI BASIS DS)
+======================= --}}
 <style>
     .form-card {
         background: #ffffff;
@@ -119,7 +132,6 @@
         max-width: 1800px;
     }
 
-    /* Alert */
     .alert {
         padding: 16px 20px;
         border-radius: 12px;
@@ -141,7 +153,6 @@
     .alert-content ul { margin: 0; padding-left: 20px; }
     .alert-content li { margin-bottom: 4px; font-size: 14px; }
 
-    /* Form */
     .form-group { margin-bottom: 28px; }
 
     .form-label {
@@ -153,21 +164,15 @@
         color:#000;
         margin-bottom: 10px;
     }
-
     .form-label i { color: #f59e0b; font-size: 16px; }
 
-    .required {
-        color: #dc2626;
-        font-weight: 700;
-        margin-left: 2px;
-    }
+    .required { color: #dc2626; font-weight: 700; margin-left: 2px; }
 
-    /* ✅ Input dibuat polos (tanpa background kuning) */
     .form-input {
         width: 100%;
         padding: 14px 16px;
         border: 2px solid #fde68a;
-        background: #ffffff;           /* <--- ubah dari #fffbeb ke putih */
+        background: #ffffff;
         border-radius: 10px;
         font-size: 14px;
         color:#000;
@@ -191,10 +196,8 @@
         margin-top: 8px;
         opacity: 0.8;
     }
-
     .input-hint i { font-size: 12px; }
 
-    /* Section gejala */
     .gejala-section {
         background: #ffffff;
         border: 1px solid #fde68a;
@@ -212,7 +215,6 @@
         color: #000;
         margin-bottom: 16px;
     }
-
     .section-label i { color: #f59e0b; }
 
     #gejala-wrapper {
@@ -221,12 +223,11 @@
         gap: 12px;
     }
 
-    /* ✅ ROW gejala: hilangkan background, pakai border aja */
     .gejala-row {
         display: flex;
         gap: 12px;
         align-items: center;
-        background: transparent;       /* <--- ini kunci */
+        background: transparent;
         padding: 14px;
         border-radius: 12px;
     }
@@ -263,6 +264,8 @@
         padding: 12px 18px;
         border-radius: 10px;
         background: #ffffff;
+        appearance: none;
+        -webkit-appearance: none;
         color: #000;
         border: 2px solid #fed7aa;
         font-weight: 700;
@@ -276,7 +279,6 @@
         box-shadow: 0 4px 12px rgba(234, 88, 12, 0.18);
     }
 
-    /* Actions (samain create/edit) */
     .form-actions {
         display: flex;
         gap: 12px;
@@ -298,11 +300,10 @@
         gap: 8px;
         transition: all 0.2s ease;
     }
-
     .btn i { font-size: 14px; }
 
     .btn-submit {
-        background: #f59e0b; /* solid */
+        background: #f59e0b;
         color: #ffffff;
         box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
     }
@@ -332,8 +333,54 @@
     }
 </style>
 
+{{-- =======================
+     SWEETALERT2
+======================= --}}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+.swal2-popup.swal-yellow {
+    width: 360px !important;
+    padding: 18px 20px !important;
+    border-radius: 14px;
+    border: 2px solid #f6c453;
+    box-shadow: 0 12px 35px rgba(0,0,0,.18);
+}
+.swal2-popup.swal-yellow .swal2-icon {
+    width: 56px !important;
+    height: 56px !important;
+    margin: 12px auto 8px !important;
+}
+.swal2-popup.swal-yellow .swal2-icon.swal2-warning {
+    border-color: #f6c453 !important;
+    color: #f6c453 !important;
+}
+.swal2-popup.swal-yellow .swal2-title {
+    font-size: 18px !important;
+    font-weight: 700;
+    margin: 6px 0 4px !important;
+    color: #3a2a00;
+}
+.swal2-popup.swal-yellow .swal2-html-container {
+    font-size: 14px !important;
+    line-height: 1.4;
+    margin: 4px 0 10px !important;
+    color: #5a4300;
+}
+.swal2-popup.swal-yellow .swal2-confirm.btn-yellow {
+    font-size: 13px !important;
+    padding: 8px 16px !important;
+    border-radius: 10px !important;
+    background: #f6c453 !important;
+    color: #3a2a00 !important;
+    border: 0 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 6px 16px rgba(246,196,83,.35);
+}
+</style>
+
 <script>
-    // ✅ dari controller: $existingMap
+    // ✅ BALIKIN MAP & DISABLE LOGIC (dari controller)
     const existingMap = @json($existingMap ?? []);
 
     function refreshGejalaOptions() {
@@ -379,20 +426,65 @@
         });
     }
 
-    document.addEventListener('DOMContentLoaded', refreshGejalaOptions);
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.getElementById('form-basis-cf');
 
-    document.addEventListener('change', function(e) {
-        if (e.target.id === 'penyakit-select' || e.target.classList.contains('gejala-select')) {
-            refreshGejalaOptions();
-        }
+        const showWarn = (msg) => Swal.fire({
+            icon: 'warning',
+            title: 'Lengkapi Data',
+            text: msg,
+            confirmButtonText: 'OK',
+            buttonsStyling: false,
+            customClass: { popup: 'swal-yellow', confirmButton: 'btn-yellow' }
+        });
+
+        // ✅ jalankan disable saat pertama kali load
+        refreshGejalaOptions();
+
+        // ✅ refresh kalau penyakit / gejala berubah
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'penyakit-select' || e.target.classList.contains('gejala-select')) {
+                refreshGejalaOptions();
+            }
+        });
+
+        // ✅ validasi submit (SweetAlert)
+        form.addEventListener('submit', function(e) {
+            const penyakit = document.getElementById('penyakit-select')?.value ?? '';
+            if (!penyakit) {
+                e.preventDefault();
+                showWarn('Lengkapi data yang belum lengkap!');
+                document.getElementById('penyakit-select')?.focus();
+                return;
+            }
+
+            const rows = form.querySelectorAll('.gejala-row');
+            for (let row of rows) {
+                const gejala = row.querySelector('.gejala-select')?.value ?? '';
+                const cf     = row.querySelector('.cf-select')?.value ?? '';
+
+                if (!gejala) {
+                    e.preventDefault();
+                    showWarn('Lengkapi data yang belum lengkap!');
+                    row.querySelector('.gejala-select')?.focus();
+                    return;
+                }
+
+                if (!cf) {
+                    e.preventDefault();
+                    showWarn('Lengkapi data yang belum lengkap!');
+                    row.querySelector('.cf-select')?.focus();
+                    return;
+                }
+            }
+        });
     });
 
     let index = 1;
 
     function tambahGejala() {
-        let wrapper = document.getElementById('gejala-wrapper');
-
-        let html = `
+        const wrapper = document.getElementById('gejala-wrapper');
+        const html = `
         <div class="gejala-row">
             <select name="gejalas[${index}][gejala_id]" class="form-input gejala-select" required>
                 <option value="">-- Pilih Gejala --</option>
@@ -403,7 +495,6 @@
 
             <select name="gejalas[${index}][cf_value]" class="form-input cf-select" required>
                 <option value="">-- Bobot CF --</option>
-                <option value="0">0 - Tidak</option>
                 <option value="0.2">0.2 - Sedikit Yakin</option>
                 <option value="0.4">0.4 - Cukup Yakin</option>
                 <option value="0.6">0.6 - Hampir Yakin</option>
@@ -412,25 +503,31 @@
             </select>
 
             <button type="button" class="btn-delete" onclick="hapusBaris(this)">✕</button>
-        </div>
-        `;
-
+        </div>`;
         wrapper.insertAdjacentHTML('beforeend', html);
         index++;
 
-        // ✅ refresh supaya option yang sudah ada / sudah dipilih jadi disabled
+        // ✅ refresh supaya option jadi abu & disabled
         refreshGejalaOptions();
     }
 
     function hapusBaris(btn) {
-        let wrapper = document.getElementById('gejala-wrapper');
-        let rows = wrapper.querySelectorAll('.gejala-row');
+        const wrapper = document.getElementById('gejala-wrapper');
+        const rows = wrapper.querySelectorAll('.gejala-row');
 
         if (rows.length > 1) {
             btn.closest('.gejala-row').remove();
+            // ✅ refresh supaya option kebuka lagi
             refreshGejalaOptions();
         } else {
-            alert('Minimal harus ada 1 gejala!');
+            Swal.fire({
+                icon: 'warning',
+                title: 'Tidak Bisa Dihapus',
+                text: 'Minimal harus ada 1 gejala!',
+                confirmButtonText: 'OK',
+                buttonsStyling: false,
+                customClass: { popup: 'swal-yellow', confirmButton: 'btn-yellow' }
+            });
         }
     }
 </script>

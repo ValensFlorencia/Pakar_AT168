@@ -87,20 +87,20 @@
                                 <i class="fas fa-pen"></i> Edit
                             </a>
 
-                            {{-- ✅ tombol tetap "Hapus", tapi kalau sudah dipakai -> alert & batal --}}
-                            <form action="{{ route('gejala.destroy', $gejala->id) }}"
+                            {{-- ✅ tombol selalu "Hapus" + pakai modal custom --}}
+                            <button type="button"
+                                    class="btn-mini btn-delete {{ $isUsed ? 'btn-disabled' : '' }}"
+                                    onclick="openDeleteModal({{ $gejala->id }}, {{ $isUsed ? 'true' : 'false' }})">
+                                <i class="fas fa-trash"></i> Hapus
+                            </button>
+
+                            {{-- form delete disembunyikan, disubmit lewat JS --}}
+                            <form id="delete-form-{{ $gejala->id }}"
+                                  action="{{ route('gejala.destroy', $gejala->id) }}"
                                   method="POST"
-                                  style="margin:0;"
-                                  onsubmit="return {{ $isUsed
-                                        ? "alert('Gejala ini tidak bisa dihapus karena sudah digunakan di basis pengetahuan/diagnosa.') || false"
-                                        : "confirm('Yakin ingin menghapus gejala ini?')"
-                                  }};">
+                                  style="display:none;">
                                 @csrf
                                 @method('DELETE')
-
-                                <button type="submit" class="btn-mini btn-delete {{ $isUsed ? 'btn-disabled' : '' }}">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
                             </form>
 
                         </div>
@@ -119,218 +119,92 @@
 
 </div>
 
-<style>
-    /* ALERT (umum) */
-    .alert{
-        padding: 14px 16px;
-        border-radius: 12px;
-        margin-bottom: 18px;
-        display: flex;
-        align-items: flex-start;
-        gap: 12px;
+{{-- ===================== MODAL CUSTOM ===================== --}}
+
+{{-- Modal Konfirmasi Hapus --}}
+<div id="deleteConfirmModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+        <h3 id="deleteConfirmTitle">Konfirmasi Penghapusan</h3>
+        <p>Apakah Anda yakin ingin menghapus gejala ini?</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeDeleteModal()">Batal</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Validasi Tidak Bisa Hapus --}}
+<div id="cannotDeleteModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cannotDeleteTitle">
+        <h3 id="cannotDeleteTitle">Penghapusan Ditolak</h3>
+        <p>Gejala ini tidak bisa dihapus karena sudah digunakan di basis pengetahuan / diagnosa.</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-submit" onclick="closeCannotDeleteModal()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simpan target delete
+    let deleteId = null;
+    let deleteIsUsed = false;
+
+    function openDeleteModal(id, isUsed) {
+        deleteId = id;
+        deleteIsUsed = isUsed;
+
+        const modal = document.getElementById('deleteConfirmModal');
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
     }
 
-    .alert-icon{
-        font-size: 15px;
-        line-height: 1;
-        margin-top: 1px;
-        flex-shrink: 0;
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteConfirmModal');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
     }
 
-    .alert-content{ flex: 1; }
-    .alert-content strong{ font-weight: 500; }
+    function confirmDelete() {
+        // tutup modal konfirmasi
+        closeDeleteModal();
 
-    /* SUKSES */
-    .alert-success{
-        background:#ecfdf5;
-        border:1px solid #86efac;
-        color:#065f46;
-    }
+        // validasi: sudah dipakai?
+        if (deleteIsUsed) {
+            const modal = document.getElementById('cannotDeleteModal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            return;
+        }
 
-    /* ERROR */
-    .alert-error{
-        background:#fef2f2;
-        border:1px solid #fecaca;
-        color:#991b1b;
-    }
-
-    .form-card{
-        background:#ffffff;
-        border-radius:16px;
-        padding:40px;
-        box-shadow:0 4px 20px rgba(0,0,0,0.08);
-        border:1px solid #fde68a;
-        max-width:1800px;
-        margin:0 auto;
+        // submit form delete
+        const form = document.getElementById('delete-form-' + deleteId);
+        if (form) form.submit();
     }
 
-    .card-top{
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        gap:16px;
-        margin-bottom:18px;
-        padding-bottom:18px;
-        border-bottom:1px solid #fde68a;
-        flex-wrap:wrap;
+    function closeCannotDeleteModal() {
+        const modal = document.getElementById('cannotDeleteModal');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
     }
 
-    .card-title{
-        margin:0;
-        font-size:18px;
-        font-weight:900;
-        color:#111827;
-        display:flex;
-        align-items:center;
-        gap:10px;
-    }
-    .card-title i{ color:#f59e0b; }
+    // klik background untuk menutup modal
+    document.addEventListener('click', function (e) {
+        const confirmModal = document.getElementById('deleteConfirmModal');
+        const cannotModal  = document.getElementById('cannotDeleteModal');
 
-    .card-subtitle{
-        margin-top:8px;
-        display:flex;
-        align-items:center;
-        gap:8px;
-        font-size:13px;
-        color:#6b7280;
-        font-weight:600;
-        opacity:1;
-    }
-    .card-subtitle i{ font-size:12px; }
+        if (e.target === confirmModal) closeDeleteModal();
+        if (e.target === cannotModal) closeCannotDeleteModal();
+    });
 
-    /* Table */
-    .table-wrap{
-        overflow-x:auto;
-        border-radius:12px;
-        border:1px solid #fde68a;
-        background:#ffffff;
-    }
-
-    .table{
-        width:100%;
-        border-collapse:collapse;
-        font-size:14px;
-        background:#fff;
-    }
-
-    .table thead{ background:#fffbeb; }
-
-    .table th{
-        padding:14px 14px;
-        text-align:left;
-        vertical-align:middle;
-        border-bottom:1px solid #fde68a;
-        color:#374151;
-        font-weight:800;
-        white-space:nowrap;
-    }
-
-    .table td{
-        padding:14px 14px;
-        text-align:left;
-        vertical-align:middle;
-        border-bottom:1px solid #fde68a;
-        color:#111827;
-        font-weight:500;
-    }
-
-    .table tbody tr:nth-child(even){ background:#fffef5; }
-    .table tbody tr:hover{ background:#fff7ed; }
-
-    .action-group{
-        display:flex;
-        gap:10px;
-        justify-content:center;
-        align-items:center;
-        flex-wrap:wrap;
-    }
-
-    .empty{
-        text-align:center;
-        padding:22px;
-        color:#6b7280;
-        font-weight:700;
-        background:#fffef5;
-    }
-
-    /* Buttons */
-    .btn{
-        padding:12px 18px;
-        border:none;
-        border-radius:12px;
-        font-size:14px;
-        font-weight:900;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-flex;
-        align-items:center;
-        gap:10px;
-        transition:all .2s ease;
-        white-space:nowrap;
-    }
-
-    .btn-submit{
-        background:#f59e0b;
-        color:#ffffff;
-        box-shadow:0 4px 12px rgba(245,158,11,0.25);
-    }
-    .btn-submit:hover{
-        background:#d97706;
-        transform: translateY(-1px);
-        box-shadow:0 6px 16px rgba(245,158,11,0.35);
-    }
-
-    .btn-mini{
-        padding:8px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:900;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-flex;
-        align-items:center;
-        gap:6px;
-        border:none;
-        transition:.2s ease;
-        white-space:nowrap;
-    }
-
-    .btn-edit{
-        background:#f59e0b;
-        color:#fff;
-        box-shadow:0 4px 12px rgba(245,158,11,.22);
-    }
-    .btn-edit:hover{
-        background:#d97706;
-        transform:translateY(-1px);
-    }
-
-    .btn-delete{
-        background:#fee2e2;
-        color:#991b1b;
-        border:1px solid #fecaca;
-    }
-    .btn-delete:hover{
-        background:#fecaca;
-        transform:translateY(-1px);
-    }
-
-    /* ✅ disabled state (tampil sama, tapi cursor tidak boleh + hover tidak berubah) */
-    .btn-disabled{
-        opacity:.75;
-        cursor:not-allowed;
-    }
-    .btn-disabled:hover{
-        transform:none;
-        background:#fee2e2;
-    }
-
-    @media (max-width:768px){
-        .form-card{ padding:24px; }
-        .card-top{ flex-direction:column; align-items:stretch; }
-        .btn{ width:100%; justify-content:center; }
-        .action-group{ justify-content:flex-start; }
-    }
-</style>
+    // ESC untuk menutup modal
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+            closeCannotDeleteModal();
+        }
+    });
+</script>
 
 @endsection

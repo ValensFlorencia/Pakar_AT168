@@ -63,7 +63,16 @@
                     <input type="text" id="gejala-search" placeholder="Cari gejala (kode / nama)..." autocomplete="off">
                     <button type="button" class="search-clear" id="gejala-search-clear" title="Hapus">✕</button>
                 </div>
-                <div class="search-meta" id="gejala-search-meta">Menampilkan semua gejala</div>
+
+                {{-- ✅ Sebaris: meta kiri, tombol panduan kanan --}}
+                <div class="search-meta-row">
+                    <div class="search-meta" id="gejala-search-meta">Menampilkan semua gejala</div>
+
+                    <button type="button" class="info-btn info-btn--small" id="open-guide" title="Panduan Diagnosa">
+                        <i class="fas fa-circle-info"></i>
+                        <span class="info-btn-text">Panduan</span>
+                    </button>
+                </div>
             </div>
 
             <div class="gejala-container">
@@ -83,7 +92,6 @@
                         <input type="hidden" name="cf_user[{{ $g->id }}]" class="cf-hidden" value="">
 
                         <div class="cf-buttons" aria-label="Pilih bobot CF" data-gejala="{{ $g->id }}">
-                            <button type="button" class="cf-btn" data-value="0">Tidak</button>
                             <button type="button" class="cf-btn" data-value="0.2">Sedikit Yakin</button>
                             <button type="button" class="cf-btn" data-value="0.4">Cukup Yakin</button>
                             <button type="button" class="cf-btn" data-value="0.6">Hampir Yakin</button>
@@ -132,140 +140,98 @@
     </form>
 </div>
 
-<style>
-    :root{ --sidebar-w: 260px; }
+{{-- ✅ MODAL PANDUAN --}}
+<div class="guide-modal" id="guide-modal" aria-hidden="true">
+    <div class="guide-backdrop" id="guide-backdrop"></div>
 
-    .stats-banner{ display:flex; gap:14px; margin-bottom:18px; max-width:1800px; margin-left:auto; margin-right:auto; }
-    .stat-card{ flex:1; background:#fff; border:1px solid #fde68a; border-radius:14px; padding:14px 18px; box-shadow:0 4px 16px rgba(0,0,0,0.05); display:flex; align-items:center; justify-content:space-between; gap:10px; }
-    .stat-number{ font-size:26px; font-weight:900; color:#111827; line-height:1; }
-    .stat-label{ font-size:13px; color:#111827; opacity:.75; font-weight:800; text-align:right; }
+    <div class="guide-panel" role="dialog" aria-modal="true" aria-labelledby="guide-title">
+        <div class="guide-head">
+            <div>
+                <div class="guide-title" id="guide-title">
+                    <i class="fas fa-circle-info"></i> Panduan Diagnosa
+                </div>
+                <div class="guide-sub">Ikuti panduan berikut untuk melakukan diagnosa.</div>
+            </div>
 
-    .form-card{
-        background:#fff; border-radius:16px; padding:40px;
-        box-shadow:0 4px 20px rgba(0,0,0,0.08); border:1px solid #fde68a;
-        max-width:1800px; margin:0 auto; font-size:14px; color:#374151;
-        padding-bottom: 170px;
-        position: relative;
-    }
+            <button type="button" class="guide-x" id="close-guide" title="Tutup">✕</button>
+        </div>
 
-    .form-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; margin-bottom:16px; flex-wrap:wrap; }
-    .form-label{ margin:0; font-size:18px; font-weight:900; color:#111827; display:flex; align-items:center; gap:10px; }
-    .form-label i{ color:#f59e0b; }
-    .required-mark{ color:#ef4444; margin-left:4px; font-weight:900; }
+        {{-- ✅ semua isi taruh di guide-body biar rapi --}}
+        <div class="guide-body">
 
-    .hint-pill{ display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:999px; background:#fffbeb; border:1px solid #fde68a; color:#111827; font-weight:800; font-size:13px; white-space:nowrap; }
-    .hint-pill i{ color:#f59e0b; }
+            {{-- ✅ Panduan CF (frekuensi/tingkat keyakinan) --}}
+            <div class="guide-section">
+                <div class="guide-section-title">
+                    <i class="fas fa-sliders"></i> Panduan Mengisi Frekuensi / Tingkat Keyakinan (Bobot CF)
+                </div>
 
-    .info-box{ background:#fffbeb; border:1px solid #fde68a; border-radius:14px; padding:16px 18px; margin-bottom:18px; display:flex; align-items:flex-start; gap:12px; }
-    .info-icon{ width:36px;height:36px;border-radius:12px; background:#fff9c4; border:1px solid #fde68a; display:flex;align-items:center;justify-content:center; font-size:18px;flex-shrink:0; }
-    .info-box-text{ font-size:14px; color:#111827; opacity:.8; line-height:1.6; font-weight:600; }
+                <div class="guide-section-desc">
+                    Pilih tingkat keyakinan sesuai seberapa sering/kuat gejala terlihat pada ayam.
+                    Semakin sering dan semakin jelas gejalanya, pilih bobot yang lebih tinggi.
+                </div>
 
-    .gejala-container{ display:flex; flex-direction:column; gap:10px; }
-    .gejala-row{
-        display:flex; align-items:center; justify-content:space-between; gap:14px;
-        padding:14px 16px; background:#fffef5; border:1px solid #fde68a;
-        border-radius:14px; transition:all .18s ease;
-    }
-    .gejala-row:hover{ background:#fff9c4; transform: translateY(-1px); box-shadow:0 6px 18px rgba(245,158,11,0.12); }
-    .gejala-row.active{ background:#fffbeb; border-color:#f59e0b; box-shadow:0 8px 22px rgba(245,158,11,0.18); }
+                <div class="cf-guide-grid">
+                    <div class="cf-guide-item">
+                        <div class="cf-guide-pill">Sedikit Yakin (0.2)</div>
+                        <div class="cf-guide-text">
+                            Gejala <b>jarang</b> muncul / <b>ringan</b> / masih ragu.
+                            <br><span class="cf-guide-ex">Contoh: muncul sesekali (± 1–2 kali).</span>
+                        </div>
+                    </div>
 
-    .checkbox-wrapper{ display:flex; align-items:center; gap:12px; flex:1; margin:0; cursor:pointer; user-select:none; min-width:0; }
-    .cb-gejala{ width:20px;height:20px; cursor:pointer; accent-color:#f59e0b; flex-shrink:0; margin-top:0; }
+                    <div class="cf-guide-item">
+                        <div class="cf-guide-pill">Cukup Yakin (0.4)</div>
+                        <div class="cf-guide-text">
+                            Gejala <b>kadang</b> muncul, mulai terlihat jelas tapi belum konsisten.
+                            <br><span class="cf-guide-ex">Contoh: muncul beberapa kali (± 3–4 kali).</span>
+                        </div>
+                    </div>
 
-    .gejala-text{ display:flex; align-items:center; gap:12px; line-height:1.4; white-space:nowrap; }
-    .gejala-code{ display:inline-flex; align-items:center; padding:3px 8px; border-radius:999px; background:#fff; border:1px solid #fde68a; color:#111827; font-weight:900; font-size:11px; white-space:nowrap; letter-spacing:0.3px; flex-shrink:0; }
-    .gejala-name{ font-size:15px; color:#111827; font-weight:400; line-height:1.35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0; }
+                    <div class="cf-guide-item">
+                        <div class="cf-guide-pill">Hampir Yakin (0.6)</div>
+                        <div class="cf-guide-text">
+                            Gejala <b>sering</b> muncul dan cukup kuat, kemungkinan besar benar.
+                            <br><span class="cf-guide-ex">Contoh: sering terlihat (± 5–7 kali).</span>
+                        </div>
+                    </div>
 
-    .cf-buttons{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; min-width:260px; opacity:.55; pointer-events:none; transition:opacity .15s ease; }
-    .gejala-row.active .cf-buttons{ opacity:1; pointer-events:auto; }
+                    <div class="cf-guide-item">
+                        <div class="cf-guide-pill">Yakin (0.8)</div>
+                        <div class="cf-guide-text">
+                            Gejala <b>sangat sering</b> muncul, jelas dan konsisten.
+                            <br><span class="cf-guide-ex">Contoh: hampir setiap waktu dicek.</span>
+                        </div>
+                    </div>
 
-    .cf-btn{ border:1.8px solid #fde68a; background:#fff; color:#111827; font-weight:900; font-size:13px; padding:10px 12px; border-radius:12px; cursor:pointer; min-width:44px; text-align:center; transition:all .15s ease; }
-    .cf-btn:hover{ border-color:#f59e0b; box-shadow:0 0 0 4px rgba(245,158,11,0.14); transform: translateY(-1px); }
-    .cf-btn.selected{ background:#f59e0b; border-color:#f59e0b; color:#fff; box-shadow:0 8px 20px rgba(245,158,11,0.25); }
-    .cf-btn.need{ border-color:#ef4444 !important; box-shadow:0 0 0 4px rgba(239,68,68,0.12) !important; }
+                    <div class="cf-guide-item">
+                        <div class="cf-guide-pill">Sangat Yakin (1.0)</div>
+                        <div class="cf-guide-text">
+                            Gejala <b>selalu</b> muncul / sangat jelas / sudah pasti terlihat.
+                            <br><span class="cf-guide-ex">Contoh: setiap observasi pasti ada.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-    .btn{ padding:12px 18px; border:none; border-radius:12px; font-size:14px; font-weight:900; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:10px; transition:all .2s ease; white-space:nowrap; }
-    .btn-submit{ background:#f59e0b; color:#fff; box-shadow:0 4px 12px rgba(245,158,11,0.25); letter-spacing:0.3px; }
-    .btn-submit:hover{ background:#d97706; transform: translateY(-1px); box-shadow:0 6px 16px rgba(245,158,11,0.35); }
+            {{-- ✅ langkah diagnosa --}}
+            <ol class="guide-steps">
+                <li><b>Cari gejala</b> (opsional) lewat kolom pencarian.</li>
+                <li><b>Centang gejala</b> yang dialami ayam.</li>
+                <li>Untuk tiap gejala yang dicentang, pilih <b>bobot CF</b> (Sedikit–Sangat Yakin).</li>
+                <li>Pastikan semua gejala yang dicentang sudah punya bobot (biar progress 100%).</li>
+                <li>Klik <b>Proses Diagnosa</b> untuk melihat hasil.</li>
+            </ol>
 
-    .error-message{ display:flex; align-items:center; gap:10px; color:#7f1d1d; background:#fef2f2; padding:12px 14px; border-radius:12px; margin-top:14px; font-size:14px; border:1px solid #fecaca; font-weight:800; }
+            <div class="guide-note">
+                <b>Tips:</b> Kalau tombol bobot belum dipilih, sistem akan menandai barisnya dan muncul peringatan.
+            </div>
+        </div>
 
-    .bottom-bar{
-        position: fixed; bottom: 0; left: var(--sidebar-w); width: calc(100% - var(--sidebar-w));
-        z-index: 9999; background: rgba(255,255,255,0.92); backdrop-filter: blur(8px);
-        border-top: 1px solid #fde68a; padding: 10px 14px; box-sizing: border-box;
-    }
-    .bottom-bar-inner{ max-width: 1800px; margin: 0 auto; display:flex; align-items:center; justify-content:space-between; gap:14px; }
-    .bb-left{ min-width:0; flex:1; }
-    .bb-title{ font-size:13px; font-weight:800; color:#111827; line-height:1.2; }
-    .bb-sub{ margin-top:2px; font-size:12px; font-weight:600; color:#6b7280; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:900px; }
-    .bb-progress{ margin-top:8px; display:flex; align-items:center; gap:10px; }
-    .bb-bar{ height:8px; flex:1; min-width:160px; background:#fff7ed; border:1px solid #fde68a; border-radius:999px; overflow:hidden; }
-    .bb-fill{ height:100%; width:0%; background:#f59e0b; border-radius:999px; transition:width .18s ease; }
-    .bb-meta{ display:inline-flex; align-items:center; gap:8px; font-size:12px; font-weight:700; color:#111827; opacity:.9; white-space:nowrap; }
-    .bb-meta .dot{ opacity:.6; }
-    .bb-badge{ display:inline-flex; padding:4px 8px; border-radius:999px; background:#fffbeb; border:1px solid #fde68a; font-weight:800; }
-    .bottom-submit{ padding:11px 16px; border-radius:14px; box-shadow:0 10px 24px rgba(0,0,0,0.12); width:auto; flex-shrink:0; }
-
-    @media (max-width: 1024px){ .bottom-bar{ left:0; width:100%; } }
-    @media (max-width: 768px){
-        .form-card{ padding:24px; padding-bottom: 220px; }
-        .stats-banner{ flex-direction:column; }
-        .gejala-row{ flex-direction:column; align-items:stretch; }
-        .cf-buttons{ min-width:100%; justify-content:flex-start; }
-        .gejala-text{ flex-wrap:wrap; }
-        .gejala-name{ white-space:normal; }
-        .bottom-bar-inner{ flex-direction:column; align-items:stretch; }
-        .bb-sub{ max-width:100%; white-space:normal; }
-        .bb-progress{ flex-direction:column; align-items:stretch; }
-        .bb-meta{ justify-content:space-between; width:100%; }
-        .bottom-submit{ width:100%; justify-content:center; }
-    }
-
-    /* Search */
-    .search-wrap{ margin: 8px 0 14px; }
-    .search-box{ display:flex; align-items:center; gap:10px; padding:12px 14px; border:1px solid #fde68a; border-radius:14px; background:#fff; box-shadow:0 4px 14px rgba(0,0,0,0.04); }
-    .search-box i{ color:#f59e0b; font-size:14px; }
-    .search-box input{ flex:1; border:none; outline:none; font-size:14px; font-weight:700; color:#111827; background:transparent; }
-    .search-box input::placeholder{ color:#9ca3af; font-weight:700; }
-    .search-clear{ border:1px solid #fde68a; background:#fffbeb; color:#111827; width:36px; height:36px; border-radius:12px; cursor:pointer; font-weight:900; display:inline-flex; align-items:center; justify-content:center; transition:all .15s ease; }
-    .search-clear:hover{ border-color:#f59e0b; box-shadow:0 0 0 4px rgba(245,158,11,0.14); transform: translateY(-1px); }
-    .search-meta{ margin-top:8px; font-size:12px; font-weight:700; color:#6b7280; }
-
-    /* Toast */
-    .toast{
-        position: sticky;
-        top: 12px;
-        z-index: 50;
-        display:flex;
-        align-items:center;
-        gap:10px;
-        padding:12px 14px;
-        margin-bottom:14px;
-        border-radius:14px;
-        border:1px solid #fecaca;
-        background:#fef2f2;
-        color:#7f1d1d;
-        font-weight:800;
-        box-shadow:0 10px 26px rgba(0,0,0,0.08);
-    }
-    .toast.ok{
-        border-color:#86efac;
-        background:#ecfdf5;
-        color:#065f46;
-    }
-    .toast-icon{ width:28px;height:28px; border-radius:10px; display:flex; align-items:center; justify-content:center; background:#fff; border:1px solid rgba(0,0,0,0.06); flex-shrink:0; }
-    .toast-text{ flex:1; min-width:0; }
-    .toast-x{
-        border:1px solid rgba(0,0,0,0.08);
-        background:#fff;
-        width:34px;height:34px;
-        border-radius:12px;
-        cursor:pointer;
-        font-weight:900;
-        display:flex; align-items:center; justify-content:center;
-    }
-</style>
+        <div class="guide-foot">
+            <button type="button" class="btn btn-outline" id="close-guide-2">Tutup</button>
+        </div>
+    </div>
+</div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -355,7 +321,6 @@ document.addEventListener('DOMContentLoaded', function () {
         let filled = 0;
         checkedRows.forEach(row => {
             const hidden = row.querySelector('.cf-hidden');
-            // dianggap terisi kalau hidden.value bukan kosong
             if (hidden && hidden.value !== '') filled++;
         });
 
@@ -420,20 +385,17 @@ document.addEventListener('DOMContentLoaded', function () {
         updateProgress();
     });
 
-    // Submit intercept: minimal 1 gejala yang punya bobot (value terisi dan bukan kosong)
+    // Submit intercept
     form.addEventListener('submit', function (e) {
         e.preventDefault();
 
         const checkedRows = getCheckedRows();
 
-        // 1) minimal ada yang dicentang
         if (checkedRows.length === 0) {
             showToast('Silakan pilih minimal 1 gejala.', 'warn');
             return;
         }
 
-        // 2) minimal ada 1 yang bobotnya terisi (dan tidak kosong)
-        // kamu mau "harus pilih 1 yang memiliki bobot" -> ini inti fix nya
         const rowsWithValue = checkedRows.filter(row => {
             const v = row.querySelector('.cf-hidden')?.value;
             return (v !== undefined && v !== null && v !== '');
@@ -441,7 +403,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (rowsWithValue.length === 0) {
             showToast('Pilih minimal 1 gejala lalu tentukan bobot CF-nya.', 'warn');
-            // kasih highlight tombol CF di baris yang dicentang
             checkedRows.forEach(row => {
                 row.querySelectorAll('.cf-btn').forEach(b => b.classList.add('need'));
                 setTimeout(() => row.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('need')), 1400);
@@ -449,8 +410,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // 3) kalau kamu mau: SEMUA yang dicentang wajib punya bobot
-        // kalau tidak mau, comment blok ini
         let okAll = true;
         checkedRows.forEach(row => {
             const hidden = row.querySelector('.cf-hidden');
@@ -465,12 +424,250 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // submit beneran
         form.submit();
     });
 
     updateProgress();
+
+    /* =============================
+       ===== Panduan Diagnosa =====
+       ============================= */
+    const openGuide = document.getElementById('open-guide');
+    const guideModal = document.getElementById('guide-modal');
+    const closeGuide = document.getElementById('close-guide');
+    const closeGuide2 = document.getElementById('close-guide-2');
+    const guideBackdrop = document.getElementById('guide-backdrop');
+
+    function showGuide(){
+        if (!guideModal) return;
+        guideModal.classList.add('show');
+        guideModal.setAttribute('aria-hidden', 'false');
+    }
+    function hideGuide(){
+        if (!guideModal) return;
+        guideModal.classList.remove('show');
+        guideModal.setAttribute('aria-hidden', 'true');
+    }
+
+    openGuide?.addEventListener('click', showGuide);
+    closeGuide?.addEventListener('click', hideGuide);
+    closeGuide2?.addEventListener('click', hideGuide);
+    guideBackdrop?.addEventListener('click', hideGuide);
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') hideGuide();
+    });
 });
 </script>
+
+<style>
+/* ====== Balikin pembatas antar gejala ====== */
+.gejala-container{
+  border: 1px solid #f3d08a;
+  border-radius: 14px;
+  overflow: hidden;
+}
+.gejala-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:12px 14px;
+  border-bottom:1px solid #f3d08a;
+}
+.gejala-row:last-child{ border-bottom:none; }
+.gejala-row:hover{ background:#fff7e6; }
+.gejala-row.active{ background:#fff3cf; }
+
+/* ✅ sebaris meta + tombol panduan */
+.search-meta-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:8px;
+}
+.search-meta-row .search-meta{
+  flex:1;
+  min-width:0;
+}
+
+/* tombol panduan kanan */
+.info-btn{
+  border:1px solid #f3d08a;
+  background:#fffdf7;
+  color:#000;
+  cursor:pointer;
+  font-weight:800;
+  transition:.15s ease;
+}
+.info-btn:hover{ background:#fff7e6; }
+.info-btn--small{
+  height:34px;
+  padding:0 12px;
+  border-radius:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  white-space:nowrap;
+}
+.info-btn-text{
+  font-weight:800;
+  font-size:13px;
+}
+
+/* ===== Modal Panduan ===== */
+.guide-modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:9999;
+}
+.guide-modal.show{ display:block; }
+
+.guide-backdrop{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.35);
+}
+
+.guide-panel{
+  position:relative;
+  max-width:720px;
+  width:calc(100% - 32px);
+  margin:80px auto;
+  background:#fffdf7;
+  border:1px solid #f3d08a;
+  border-radius:16px;
+  box-shadow:0 14px 40px rgba(0,0,0,.2);
+  overflow:hidden;
+}
+
+.guide-head{
+  display:flex;
+  justify-content:space-between;
+  gap:14px;
+  padding:16px 16px 12px 16px;
+  border-bottom:1px solid #f3d08a;
+}
+.guide-title{
+  font-weight:900;
+  font-size:18px;
+  color:#000;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.guide-sub{
+  font-size:13px;
+  color:#6b7280;
+  margin-top:4px;
+}
+.guide-x{
+  border:none;
+  background:transparent;
+  font-size:18px;
+  cursor:pointer;
+  width:38px;
+  height:38px;
+  border-radius:10px;
+}
+.guide-x:hover{ background:#fff7e6; }
+
+.guide-body{
+  padding:16px;
+}
+
+.guide-steps{
+  margin:0;
+  padding-left:18px;
+  color:#000;
+}
+.guide-steps li{
+  margin:8px 0;
+  line-height:1.45;
+}
+
+.guide-note{
+  margin-top:12px;
+  padding:12px 14px;
+  background:#fff7e6;
+  border:1px solid #f3d08a;
+  border-radius:12px;
+  color:#2b1a00;
+  font-size:14px;
+}
+
+.guide-foot{
+  padding:14px 16px;
+  border-top:1px solid #f3d08a;
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+}
+
+/* ===== Panduan CF (frekuensi) ===== */
+.guide-section{
+  margin-bottom:14px;
+  padding-bottom:14px;
+  border-bottom:1px dashed #f3d08a;
+}
+.guide-section-title{
+  font-weight:900;
+  color:#000;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+.guide-section-desc{
+  font-size:14px;
+  color:#4b5563;
+  margin-bottom:10px;
+  line-height:1.45;
+}
+.cf-guide-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:10px;
+}
+.cf-guide-item{
+  border:1px solid #f3d08a;
+  background:#fffdf7;
+  border-radius:12px;
+  padding:10px 12px;
+}
+.cf-guide-pill{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:13px;
+  background:#fff7e6;
+  border:1px solid #f3d08a;
+  color:#000;
+  margin-bottom:6px;
+}
+.cf-guide-text{
+  font-size:14px;
+  color:#2b1a00;
+  line-height:1.45;
+}
+.cf-guide-ex{
+  color:#6b7280;
+  font-size:13px;
+}
+.guide-panel{
+  max-height: calc(100vh - 140px);
+  display:flex;
+  flex-direction:column;
+}
+.guide-body{
+  overflow:auto;
+  flex:1; /* ✅ otomatis ngisi sisa tinggi */
+}
+
+</style>
 
 @endsection

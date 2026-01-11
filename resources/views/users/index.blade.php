@@ -1,3 +1,4 @@
+{{-- resources/views/users/index.blade.php --}}
 @extends('layouts.app')
 
 @section('title', 'Data Users')
@@ -5,20 +6,22 @@
 @section('content')
 
 <div class="page-header" style="margin-bottom:30px;">
-    <h1 class="page-title">Data Users</h1>
+    <h1 class="page-title">Data Pengguna</h1>
     <p class="page-subtitle">Kelola akun dan role.</p>
 </div>
 
 {{-- Alert --}}
 @if(session('success'))
     <div class="alert-success">
-        ✅ {{ session('success') }}
+        <i class="fas fa-check-circle"></i>
+        {{ session('success') }}
     </div>
 @endif
 
 @if(session('error'))
-    <div class="alert-danger">
-        ⚠️ {{ session('error') }}
+    <div class="alert-error">
+        <i class="fas fa-exclamation-circle"></i>
+        {{ session('error') }}
     </div>
 @endif
 
@@ -28,7 +31,7 @@
         <div>
             <h2 class="card-title">
                 <i class="fas fa-users"></i>
-                Daftar User
+                Daftar Pengguna
             </h2>
             <div class="card-subtitle">
                 <i class="fas fa-info-circle"></i>
@@ -38,9 +41,18 @@
 
         <a href="{{ route('users.create') }}" class="btn btn-submit">
             <i class="fas fa-user-plus"></i>
-            Tambah User
+            Tambah Pengguna
         </a>
     </div>
+
+    @php
+        /**
+         * Controller harus kirim:
+         * $usedUserIds = [..id user yang sudah pernah diagnosa..]
+         * contoh: user punya riwayat di tabel riwayat_diagnosa
+         */
+        $usedUserIds = $usedUserIds ?? [];
+    @endphp
 
     <div class="table-wrap">
         <table class="table">
@@ -55,6 +67,10 @@
 
             <tbody>
             @forelse($users as $u)
+                @php
+                    $isUsed = in_array($u->id, $usedUserIds, true);
+                @endphp
+
                 <tr>
                     <td>
                         <div class="user-name">{{ $u->name }}</div>
@@ -68,26 +84,35 @@
                         </span>
                     </td>
                     <td style="text-align:center; white-space:nowrap;">
-                        <a href="{{ route('users.edit', $u->id) }}" class="btn-mini btn-edit">
-                            <i class="fas fa-pen"></i> Edit
-                        </a>
+                        <div class="action-group" style="justify-content:center;">
 
-                        <form action="{{ route('users.destroy', $u->id) }}"
-                              method="POST"
-                              style="display:inline;"
-                              onsubmit="return confirm('Yakin hapus user ini?')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-mini btn-delete">
+                            <a href="{{ route('users.edit', $u->id) }}" class="btn-mini btn-edit">
+                                <i class="fas fa-pen"></i> Edit
+                            </a>
+
+                            {{-- ✅ tombol Hapus pakai modal custom --}}
+                            <button type="button"
+                                    class="btn-mini btn-delete {{ $isUsed ? 'btn-disabled' : '' }}"
+                                    onclick="openDeleteModal({{ $u->id }}, {{ $isUsed ? 'true' : 'false' }})">
                                 <i class="fas fa-trash"></i> Hapus
                             </button>
-                        </form>
+
+                            {{-- form delete hidden, disubmit lewat JS --}}
+                            <form id="delete-form-{{ $u->id }}"
+                                  action="{{ route('users.destroy', $u->id) }}"
+                                  method="POST"
+                                  style="display:none;">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+
+                        </div>
                     </td>
                 </tr>
             @empty
                 <tr>
                     <td colspan="4" class="empty">
-                        Belum ada user.
+                        Belum ada pengguna.
                     </td>
                 </tr>
             @endforelse
@@ -97,222 +122,90 @@
 
 </div>
 
-<style>
+{{-- ===================== MODAL CUSTOM ===================== --}}
 
-    /* Card */
-    .form-card{
-        background:#ffffff;
-        border-radius:16px;
-        padding:40px;
-        box-shadow:0 4px 20px rgba(0,0,0,0.08);
-        border:1px solid #fde68a;
-        margin:0 auto;
+{{-- Modal Konfirmasi Hapus --}}
+<div id="deleteConfirmModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+        <h3 id="deleteConfirmTitle">Konfirmasi Penghapusan</h3>
+        <p>Apakah Anda yakin ingin menghapus pengguna ini?</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-cancel" onclick="closeDeleteModal()">Batal</button>
+            <button type="button" class="btn btn-danger" onclick="confirmDelete()">Ya, Hapus</button>
+        </div>
+    </div>
+</div>
+
+{{-- Modal Validasi Tidak Bisa Hapus --}}
+<div id="cannotDeleteModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cannotDeleteTitle">
+        <h3 id="cannotDeleteTitle">Penghapusan Ditolak</h3>
+        <p>Pengguna ini tidak bisa dihapus karena sudah pernah melakukan diagnosa.</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-submit" onclick="closeCannotDeleteModal()">OK</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Simpan target delete
+    let deleteId = null;
+    let deleteIsUsed = false;
+
+    function openDeleteModal(id, isUsed) {
+        deleteId = id;
+        deleteIsUsed = isUsed;
+
+        const modal = document.getElementById('deleteConfirmModal');
+        modal.style.display = 'flex';
+        modal.setAttribute('aria-hidden', 'false');
     }
 
-    .card-top{
-        display:flex;
-        justify-content:space-between;
-        align-items:flex-start;
-        gap:16px;
-        margin-bottom:18px;
-        padding-bottom:18px;
-        border-bottom:1px solid #fde68a;
-        flex-wrap:wrap;
+    function closeDeleteModal() {
+        const modal = document.getElementById('deleteConfirmModal');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
     }
 
-    .card-title{
-        margin:0;
-        font-size:18px;
-        font-weight:900;
-        color:#111827;           /* ✅ hitam */
-        display:flex;
-        align-items:center;
-        gap:10px;
-    }
-    .card-title i{ color:#f59e0b; }
+    function confirmDelete() {
+        closeDeleteModal();
 
-    .card-subtitle{
-        margin-top:8px;
-        display:flex;
-        align-items:center;
-        gap:8px;
-        font-size:13px;
-        color:#6b7280;           /* ✅ abu */
-        opacity:1;
-        font-weight:600;
+        // validasi: sudah pernah diagnosa?
+        if (deleteIsUsed) {
+            const modal = document.getElementById('cannotDeleteModal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            return;
+        }
+
+        const form = document.getElementById('delete-form-' + deleteId);
+        if (form) form.submit();
     }
 
-    /* Alerts */
-    .alert-success{
-        background:#dcfce7;
-        border:1px solid #22c55e;
-        color:#166534;
-        padding:12px 14px;
-        border-radius:12px;
-        margin-bottom:14px;
-        max-width:1800px;
-        font-weight:700;
+    function closeCannotDeleteModal() {
+        const modal = document.getElementById('cannotDeleteModal');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
     }
 
-    .alert-danger{
-        background:#fee2e2;
-        border:1px solid #ef4444;
-        color:#991b1b;
-        padding:12px 14px;
-        border-radius:12px;
-        margin-bottom:14px;
-        max-width:1800px;
-        font-weight:700;
-    }
+    // klik background untuk menutup modal
+    document.addEventListener('click', function (e) {
+        const confirmModal = document.getElementById('deleteConfirmModal');
+        const cannotModal  = document.getElementById('cannotDeleteModal');
 
-    /* Table */
-    .table-wrap{
-        overflow-x:auto;
-        border-radius:12px;
-        border:1px solid #fde68a;
-        background:#ffffff;
-    }
+        if (e.target === confirmModal) closeDeleteModal();
+        if (e.target === cannotModal) closeCannotDeleteModal();
+    });
 
-    .table{
-        width:100%;
-        border-collapse:collapse;
-        font-size:14px;
-    }
-
-    .table thead{
-        background:#fffbeb;
-    }
-
-    .table th{
-        padding:14px 14px;
-        border-bottom:1px solid #fde68a;
-        text-align:left;
-        vertical-align:middle;
-        color:#374151;           /* ✅ abu gelap */
-        font-weight:800;
-    }
-
-    .table td{
-        padding:14px 14px;
-        border-bottom:1px solid #fde68a;
-        text-align:left;
-        vertical-align:middle;
-        color:#111827;           /* ✅ hitam */
-        font-weight:500;
-    }
-
-    .table tbody tr:nth-child(even){ background:#fffef5; }
-    .table tbody tr:hover{ background:#fff7ed; }
-
-    .empty{
-        text-align:center;
-        padding:22px;
-        color:#6b7280;           /* ✅ abu */
-        font-weight:700;
-        background:#fffef5;
-    }
-
-    .user-name{
-        font-weight:700;
-        color:#111827;           /* ✅ hitam */
-    }
-
-    .user-email{
-        font-size:13px;
-        color:#6b7280;           /* ✅ abu */
-        font-weight:600;
-    }
-
-    /* Role badge (biarin sesuai warna role) */
-    .badge-role{
-        padding:6px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:900;
-        display:inline-block;
-        text-transform:capitalize;
-    }
-
-    .badge-role.admin{
-        background:#fee2e2;
-        color:#991b1b;
-        border:1px solid #fecaca;
-    }
-
-    .badge-role.pakar{
-        background:#e0f2fe;
-        color:#075985;
-        border:1px solid #bae6fd;
-    }
-
-    .badge-role.user{
-        background:#dcfce7;
-        color:#166534;
-        border:1px solid #bbf7d0;
-    }
-
-    /* Buttons */
-    .btn{
-        padding:12px 18px;
-        border:none;
-        border-radius:12px;
-        font-size:14px;
-        font-weight:900;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-flex;
-        align-items:center;
-        gap:10px;
-        transition:all .2s ease;
-        white-space:nowrap;
-    }
-
-    .btn-submit{
-        background:#f59e0b;
-        color:#ffffff;
-        box-shadow:0 4px 12px rgba(245,158,11,0.25);
-    }
-
-    .btn-submit:hover{
-        background:#d97706;
-        transform: translateY(-1px);
-    }
-
-    .btn-mini{
-        padding:8px 12px;
-        border-radius:999px;
-        font-size:12px;
-        font-weight:900;
-        cursor:pointer;
-        text-decoration:none;
-        display:inline-flex;
-        align-items:center;
-        gap:6px;
-        border:none;
-        transition:.2s ease;
-    }
-
-    .btn-edit{
-        background:#fffbeb;
-        color:#111827;           /* ✅ hitam */
-        border:1px solid #fde68a;
-    }
-
-    .btn-delete{
-        background:#fee2e2;
-        color:#991b1b;
-        border:1px solid #fecaca;
-    }
-
-    .btn-mini:hover{
-        transform: translateY(-1px);
-    }
-
-    @media (max-width:768px){
-        .form-card{ padding:24px; }
-        .btn{ width:100%; justify-content:center; }
-        .card-top{ flex-direction:column; align-items:stretch; }
-    }
-</style>
+    // ESC untuk menutup modal
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') {
+            closeDeleteModal();
+            closeCannotDeleteModal();
+        }
+    });
+</script>
 
 @endsection

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Penyakit;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PenyakitController extends Controller
 {
@@ -13,7 +14,14 @@ class PenyakitController extends Controller
     public function index()
     {
         $penyakits = Penyakit::orderBy('kode_penyakit')->get();
-        return view('penyakit.index', compact('penyakits'));
+
+        // ✅ ambil semua ID penyakit yang sudah dipakai di basis pengetahuan CF/DS
+        $usedCf = DB::table('basis_pengetahuan_cf')->pluck('penyakit_id')->filter()->unique()->toArray();
+        $usedDs = DB::table('basis_pengetahuan_ds')->pluck('penyakit_id')->filter()->unique()->toArray();
+
+        $usedPenyakitIds = array_values(array_unique(array_merge($usedCf, $usedDs)));
+
+        return view('penyakit.index', compact('penyakits', 'usedPenyakitIds'));
     }
 
     /**
@@ -98,5 +106,29 @@ class PenyakitController extends Controller
 
         return redirect()->route('penyakit.index')
             ->with('success', 'Penyakit berhasil diperbarui.');
+    }
+
+    /**
+     * Hapus penyakit (blok jika sudah dipakai di basis pengetahuan/diagnosa)
+     */
+    public function destroy($id)
+    {
+        $penyakit = Penyakit::findOrFail($id);
+
+        // ✅ blok hapus kalau penyakit sudah dipakai
+        $isUsed = DB::table('basis_pengetahuan_cf')->where('penyakit_id', $penyakit->id)->exists()
+               || DB::table('basis_pengetahuan_ds')->where('penyakit_id', $penyakit->id)->exists();
+
+        if ($isUsed) {
+            return redirect()
+                ->route('penyakit.index')
+                ->with('error', 'Penyakit tidak bisa dihapus karena sudah digunakan di basis pengetahuan/diagnosa.');
+        }
+
+        $penyakit->delete();
+
+        return redirect()
+            ->route('penyakit.index')
+            ->with('success', 'Penyakit berhasil dihapus.');
     }
 }

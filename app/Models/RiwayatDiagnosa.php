@@ -2,15 +2,17 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class RiwayatDiagnosa extends Model
 {
+    use HasFactory;
+
     protected $table = 'riwayat_diagnosas';
 
     protected $fillable = [
         'user_id',
-        'judul',
         'payload',
         'diagnosa_at',
     ];
@@ -22,6 +24,6 @@ class RiwayatDiagnosa extends Model
 
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(User::class);
     }
 }
