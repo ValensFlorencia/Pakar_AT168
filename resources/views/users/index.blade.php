@@ -49,9 +49,9 @@
         /**
          * Controller harus kirim:
          * $usedUserIds = [..id user yang sudah pernah diagnosa..]
-         * contoh: user punya riwayat di tabel riwayat_diagnosa
          */
         $usedUserIds = $usedUserIds ?? [];
+        $authId = auth()->id(); // ✅ id user yang sedang login
     @endphp
 
     <div class="table-wrap">
@@ -68,7 +68,8 @@
             <tbody>
             @forelse($users as $u)
                 @php
-                    $isUsed = in_array($u->id, $usedUserIds, true);
+                    $isUsed = in_array($u->id, $usedUserIds, true); // ✅ pernah diagnosa?
+                    $isSelf = ($authId === $u->id);                 // ✅ akun sedang login?
                 @endphp
 
                 <tr>
@@ -92,8 +93,8 @@
 
                             {{-- ✅ tombol Hapus pakai modal custom --}}
                             <button type="button"
-                                    class="btn-mini btn-delete {{ $isUsed ? 'btn-disabled' : '' }}"
-                                    onclick="openDeleteModal({{ $u->id }}, {{ $isUsed ? 'true' : 'false' }})">
+                                    class="btn-mini btn-delete {{ ($isUsed || $isSelf) ? 'btn-disabled' : '' }}"
+                                    onclick="openDeleteModal({{ $u->id }}, {{ $isUsed ? 'true' : 'false' }}, {{ $isSelf ? 'true' : 'false' }})">
                                 <i class="fas fa-trash"></i> Hapus
                             </button>
 
@@ -137,7 +138,7 @@
     </div>
 </div>
 
-{{-- Modal Validasi Tidak Bisa Hapus --}}
+{{-- Modal Validasi Tidak Bisa Hapus (pernah diagnosa) --}}
 <div id="cannotDeleteModal" class="modal-overlay" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cannotDeleteTitle">
         <h3 id="cannotDeleteTitle">Penghapusan Ditolak</h3>
@@ -149,15 +150,46 @@
     </div>
 </div>
 
+{{-- Modal Tidak Bisa Hapus Akun Sendiri --}}
+<div id="cannotDeleteSelfModal" class="modal-overlay" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cannotDeleteSelfTitle">
+        <h3 id="cannotDeleteSelfTitle">Penghapusan Ditolak</h3>
+        <p>Tidak bisa menghapus akun yang sedang login.</p>
+
+        <div class="modal-actions">
+            <button type="button" class="btn btn-submit" onclick="closeCannotDeleteSelfModal()">OK</button>
+        </div>
+    </div>
+</div>
+
 <script>
     // Simpan target delete
     let deleteId = null;
     let deleteIsUsed = false;
+    let deleteIsSelf = false;
 
-    function openDeleteModal(id, isUsed) {
+    function openDeleteModal(id, isUsed, isSelf) {
         deleteId = id;
         deleteIsUsed = isUsed;
+        deleteIsSelf = isSelf;
 
+        // ✅ PRIORITAS 1: tidak boleh hapus akun sendiri
+        if (deleteIsSelf) {
+            const modal = document.getElementById('cannotDeleteSelfModal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            return;
+        }
+
+        // ✅ PRIORITAS 2: tidak boleh hapus user yang pernah diagnosa
+        if (deleteIsUsed) {
+            const modal = document.getElementById('cannotDeleteModal');
+            modal.style.display = 'flex';
+            modal.setAttribute('aria-hidden', 'false');
+            return;
+        }
+
+        // ✅ Kalau aman, baru tampilkan konfirmasi
         const modal = document.getElementById('deleteConfirmModal');
         modal.style.display = 'flex';
         modal.setAttribute('aria-hidden', 'false');
@@ -171,15 +203,6 @@
 
     function confirmDelete() {
         closeDeleteModal();
-
-        // validasi: sudah pernah diagnosa?
-        if (deleteIsUsed) {
-            const modal = document.getElementById('cannotDeleteModal');
-            modal.style.display = 'flex';
-            modal.setAttribute('aria-hidden', 'false');
-            return;
-        }
-
         const form = document.getElementById('delete-form-' + deleteId);
         if (form) form.submit();
     }
@@ -190,13 +213,21 @@
         modal.setAttribute('aria-hidden', 'true');
     }
 
+    function closeCannotDeleteSelfModal() {
+        const modal = document.getElementById('cannotDeleteSelfModal');
+        modal.style.display = 'none';
+        modal.setAttribute('aria-hidden', 'true');
+    }
+
     // klik background untuk menutup modal
     document.addEventListener('click', function (e) {
         const confirmModal = document.getElementById('deleteConfirmModal');
         const cannotModal  = document.getElementById('cannotDeleteModal');
+        const selfModal    = document.getElementById('cannotDeleteSelfModal');
 
         if (e.target === confirmModal) closeDeleteModal();
         if (e.target === cannotModal) closeCannotDeleteModal();
+        if (e.target === selfModal) closeCannotDeleteSelfModal();
     });
 
     // ESC untuk menutup modal
@@ -204,6 +235,7 @@
         if (e.key === 'Escape') {
             closeDeleteModal();
             closeCannotDeleteModal();
+            closeCannotDeleteSelfModal();
         }
     });
 </script>

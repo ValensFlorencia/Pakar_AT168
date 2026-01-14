@@ -27,8 +27,23 @@ class LoginRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'string', 'email'],
+            'email'    => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+        ];
+    }
+
+    /**
+     * ✅ Custom pesan validasi (sesuai kebutuhan kamu)
+     */
+    public function messages(): array
+    {
+        return [
+            'email.required'    => 'email wajib diisi',
+            'email.string'      => 'email wajib berupa teks',
+            'email.email'       => 'format email tidak valid',
+
+            'password.required' => 'password wajib diisi',
+            'password.string'   => 'password wajib berupa teks',
         ];
     }
 

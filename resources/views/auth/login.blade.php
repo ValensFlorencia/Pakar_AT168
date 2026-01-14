@@ -51,15 +51,32 @@
                         Masuk untuk mengakses portal sistem pakar.
                     </p>
 
-                    {{-- ✅ ALERT kalau email/password salah --}}
+                    {{-- ✅ ALERT ERROR LOGIN --}}
                     @if ($errors->any())
+                        @php
+                            $allErrors = $errors->all();
+
+                            // Breeze biasanya: auth failed dilempar ke field 'email' dengan pesan auth.failed
+                            $authFailedMsg = $errors->first('email');
+
+                            // Anggap auth-failed jika:
+                            // - hanya ada 1 error, dan error itu berada di field email
+                            // - dan password tidak punya error "required"
+                            $hasAuthFailed = count($allErrors) === 1
+                                && !empty($authFailedMsg)
+                                && !$errors->has('password');
+                        @endphp
+
+                        @if ($errors->has('email') && !$errors->has('password'))
                         <div class="mb-3 text-xs text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
                             <strong>Email atau Password yang Anda masukkan salah.</strong>
                         </div>
                     @endif
 
+                    @endif
 
-                    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+                    {{-- ✅ novalidate + HAPUS required agar tidak muncul tooltip browser --}}
+                    <form method="POST" action="{{ route('login') }}" class="space-y-4" novalidate>
                         @csrf
 
                         {{-- Email --}}
@@ -80,11 +97,15 @@
                                        type="email"
                                        name="email"
                                        value="{{ old('email') }}"
-                                       required
                                        autofocus
                                        placeholder="masukkan email"
                                        class="ml-2 flex-1 bg-transparent border-none outline-none text-sm text-slate-700 placeholder:text-slate-400" />
                             </div>
+
+                            {{-- error field email (opsional, tidak ganggu) --}}
+                            @error('email')
+                                <div class="text-[11px] text-red-600 mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         {{-- Password --}}
@@ -102,11 +123,14 @@
                                 <input id="password"
                                        type="password"
                                        name="password"
-                                       required
                                        autocomplete="current-password"
-                                       placeholder="••••••••"
                                        class="ml-2 flex-1 bg-transparent border-none outline-none text-sm text-slate-700 placeholder:text-slate-400" />
                             </div>
+
+                            {{-- error field password (opsional, tidak ganggu) --}}
+                            @error('password')
+                                <div class="text-[11px] text-red-600 mt-1">{{ $message }}</div>
+                            @enderror
                         </div>
 
                         {{-- Tombol login --}}

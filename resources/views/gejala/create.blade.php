@@ -29,7 +29,8 @@
         </div>
     @endif
 
-    <form action="{{ route('gejala.store') }}" method="POST">
+    <form action="{{ route('gejala.store') }}" method="POST" novalidate>
+
         @csrf
 
         {{-- Kode Gejala --}}
@@ -61,7 +62,6 @@
                 name="nama_gejala"
                 rows="4"
                 placeholder="Contoh: Ayam tampak lesu dan nafsu makan menurun"
-                required
                 class="form-input form-textarea">{{ old('nama_gejala') }}</textarea>
             <div class="input-hint">
                 <i class="fas fa-lightbulb"></i>

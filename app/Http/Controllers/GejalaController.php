@@ -40,10 +40,15 @@ class GejalaController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'kode_gejala' => 'required|unique:gejala,kode_gejala',
-            'nama_gejala' => 'required',
-        ]);
+        $request->validate(
+            [
+                'kode_gejala' => 'required|unique:gejala,kode_gejala',
+                'nama_gejala' => 'required',
+            ],
+            [
+                'nama_gejala.required' => 'Gejala harus diisi',
+            ]
+        );
 
         Gejala::create($request->all());
 

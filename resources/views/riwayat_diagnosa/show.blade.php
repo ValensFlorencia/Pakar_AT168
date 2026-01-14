@@ -62,6 +62,98 @@
     $getSolusi = fn($kode) => $kode ? ($solusiMap[$kode] ?? null) : null;
 @endphp
 
+<style>
+/* =========================
+   FIX MODAL SCROLL + LOCK BG
+   ========================= */
+.modal-backdrop{
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: none;              /* default hidden */
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    background: rgba(0,0,0,.45);
+    backdrop-filter: blur(2px);
+}
+
+.modal-backdrop.is-open{
+    display: flex;              /* show */
+}
+
+.modal-card{
+    width: min(720px, 100%);
+    max-height: calc(100vh - 36px); /* penting biar modal gak kepanjangan */
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;           /* head fixed, body scroll */
+    box-shadow: 0 18px 55px rgba(0,0,0,.25);
+    transform: translateY(6px);
+    opacity: 0;
+    transition: .18s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.modal-backdrop.is-open .modal-card{
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.modal-head{
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px 16px 12px;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+    background: #fff;
+}
+
+.modal-kode{
+    font-size: 12px;
+    opacity: .75;
+    margin-bottom: 4px;
+}
+
+.modal-title{
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.modal-close{
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 18px;
+    line-height: 1;
+    padding: 8px 10px;
+    border-radius: 10px;
+}
+
+.modal-close:hover{
+    background: rgba(0,0,0,.06);
+}
+
+.modal-body{
+    padding: 14px 16px 16px;
+    overflow-y: auto;           /* INI KUNCINYA: isi bisa scroll */
+    -webkit-overflow-scrolling: touch;
+    white-space: pre-line;      /* biar enter/newline dari solusi kebaca */
+    line-height: 1.55;
+    font-size: 14px;
+}
+
+/* lock background scroll */
+body.no-scroll{
+    overflow: hidden !important;
+    height: 100%;
+    touch-action: none;
+}
+</style>
+
 <div class="page-head">
     <div>
         <h1 class="page-title">Detail Riwayat Diagnosa</h1>
@@ -88,7 +180,7 @@
     </div>
 </div>
 
-{{-- PILL TOP CF / TOP DS (kayak hasil diagnosa) --}}
+{{-- PILL TOP CF / TOP DS --}}
 <div class="pill-top-wrap">
     <div class="pill big">
         <span class="pill-label">Top CF</span>
@@ -113,7 +205,7 @@
     </div>
 </div>
 
-{{-- CARD KESIMPULAN (TANPA TEKS "3 kemungkinan..." / kesimpulan panjang) --}}
+{{-- CARD KESIMPULAN --}}
 <div class="card">
     <div class="card-head">
         <h3>Kesimpulan</h3>
@@ -138,7 +230,7 @@
 
     <div class="divider"></div>
 
-    {{-- TOP 3 (dua box besar) --}}
+    {{-- TOP 3 --}}
     <div class="summary-grid">
         {{-- CF TOP 3 --}}
         <div class="summary-box">
@@ -331,6 +423,7 @@
         </div>
     @endif
 </div>
+
 <script>
 const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
 
@@ -344,10 +437,35 @@ const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
 
     if (!modal) return;
 
+    let scrollY = 0;
+
+    function lockBody() {
+        scrollY = window.scrollY || 0;
+        document.body.classList.add('no-scroll');
+
+        // biar posisi ga loncat saat overflow hidden
+        document.body.style.position = 'fixed';
+        document.body.style.top = `-${scrollY}px`;
+        document.body.style.left = '0';
+        document.body.style.right = '0';
+        document.body.style.width = '100%';
+    }
+
+    function unlockBody() {
+        document.body.classList.remove('no-scroll');
+
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.left = '';
+        document.body.style.right = '';
+        document.body.style.width = '';
+
+        window.scrollTo(0, scrollY);
+    }
+
     function openModal(kode, nama) {
         const key = String(kode || '').trim().toUpperCase();
 
-        // kalau solusiByKode array, aksesnya tetap bisa pakai ["P01"]
         const solusi = solusiByKode[key];
 
         elKode.textContent = key || '-';
@@ -356,6 +474,7 @@ const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
             ? solusi
             : 'Solusi belum diisi pada data penyakit.';
 
+        lockBody();
         modal.classList.add('is-open');
         modal.setAttribute('aria-hidden', 'false');
     }
@@ -363,6 +482,7 @@ const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
     function closeModal() {
         modal.classList.remove('is-open');
         modal.setAttribute('aria-hidden', 'true');
+        unlockBody();
     }
 
     document.querySelectorAll('.top3-row.clickable').forEach(row => {
@@ -378,7 +498,7 @@ const solusiByKode = @json($solusiMap ?? []); // ✅ jangan pakai {}
     });
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeModal();
+        if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
     });
 })();
 </script>

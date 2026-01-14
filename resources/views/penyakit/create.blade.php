@@ -29,7 +29,8 @@
         </div>
     @endif
 
-    <form action="{{ route('penyakit.store') }}" method="POST">
+    <form action="{{ route('penyakit.store') }}" method="POST" novalidate>
+
         @csrf
 
         {{-- Kode Penyakit --}}

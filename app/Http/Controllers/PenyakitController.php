@@ -48,13 +48,19 @@ class PenyakitController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama_penyakit' => 'required',
-            'deskripsi'     => 'required',
-            'solusi'        => 'required',
-        ]);
+        $request->validate(
+            [
+                'nama_penyakit' => 'required',
+                'deskripsi'     => 'required',
+                'solusi'        => 'required',
+            ],
+            [
+                'nama_penyakit.required' => 'Penyakit wajib diisi',
+                'deskripsi.required'     => 'Deskripsi wajib diisi',
+                'solusi.required'        => 'Solusi wajib diisi',
+            ]
+        );
 
-        // Generate kode penyakit otomatis
         $last = Penyakit::orderBy('id', 'desc')->first();
 
         if ($last && $last->kode_penyakit) {
@@ -64,7 +70,6 @@ class PenyakitController extends Controller
             $kodeBaru = 'P01';
         }
 
-        // Simpan penyakit baru
         Penyakit::create([
             'kode_penyakit' => $kodeBaru,
             'nama_penyakit' => $request->nama_penyakit,
@@ -75,7 +80,6 @@ class PenyakitController extends Controller
         return redirect()->route('penyakit.index')
             ->with('success', 'Penyakit berhasil ditambahkan.');
     }
-
     /**
      * Form edit penyakit
      */
@@ -92,11 +96,18 @@ class PenyakitController extends Controller
     {
         $penyakit = Penyakit::findOrFail($id);
 
-        $request->validate([
-            'nama_penyakit' => 'required',
-            'deskripsi'     => 'required',
-            'solusi'        => 'required',
-        ]);
+        $request->validate(
+            [
+                'nama_penyakit' => 'required',
+                'deskripsi'     => 'required',
+                'solusi'        => 'required',
+            ],
+            [
+                'nama_penyakit.required' => 'Penyakit wajib diisi',
+                'deskripsi.required'     => 'Deskripsi wajib diisi',
+                'solusi.required'        => 'Solusi wajib diisi',
+            ]
+        );
 
         $penyakit->update([
             'nama_penyakit' => $request->nama_penyakit,

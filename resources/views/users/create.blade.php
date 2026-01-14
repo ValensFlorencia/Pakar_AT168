@@ -7,7 +7,7 @@
 <div class="user-create-page">
 
     <div class="page-header" style="margin-bottom:30px;">
-        <h1 class="page-title">Tambah User</h1>
+        <h1 class="page-title">Tambah Pengguna</h1>
         <p class="page-subtitle">Buat akun baru dan tentukan role.</p>
     </div>
 
@@ -31,7 +31,7 @@
             <div>
                 <h2 class="card-title">
                     <i class="fas fa-user-plus"></i>
-                    Form Tambah User
+                    Form Tambah Pengguna
                 </h2>
                 <div class="card-subtitle">
                     <i class="fas fa-info-circle"></i>
@@ -46,7 +46,8 @@
         </div>
 
         {{-- autocomplete off di form (tetap bisa diabaikan Chrome, makanya ada readonly-trick di bawah) --}}
-        <form method="POST" action="{{ route('users.store') }}" autocomplete="off">
+        <form method="POST" action="{{ route('users.store') }}" autocomplete="off" novalidate>
+
             @csrf
 
             <div class="grid-2">

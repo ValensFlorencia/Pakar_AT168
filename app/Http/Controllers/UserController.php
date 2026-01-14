@@ -36,12 +36,33 @@ class UserController extends Controller
     {
         $roles = $this->roles;
 
-        $request->validate([
+
+        $request->validate(
+        [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:6', 'confirmed'], // form harus punya password_confirmation
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
             'role' => ['required', Rule::in($roles)],
-        ]);
+        ],
+        [
+            // NAMA
+            'name.required' => 'nama wajib diisi',
+
+            // EMAIL
+            'email.required' => 'email wajib diisi',
+            'email.email'    => 'format email tidak valid',
+            'email.unique'   => 'email sudah digunakan',
+
+            // PASSWORD
+            'password.required'  => 'password wajib diisi',
+            'password.min'       => 'password minimal 6 karakter',
+            'password.confirmed' => 'konfirmasi password tidak cocok',
+
+            // ROLE
+            'role.required' => 'role wajib dipilih',
+        ]
+    );
+
 
         User::create([
             'name' => $request->name,
